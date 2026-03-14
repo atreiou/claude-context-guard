@@ -10,7 +10,7 @@ Claude Code sessions get cut off by rate limits, context compaction, and crashes
 
 This is a known issue. [Anthropic's own engineering team](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) documented the same failure modes and recommended external state files as the solution.
 
-## The Solution
+## My Solution
 
 Context Guard creates a set of safeguard files that persist across sessions, plus two slash commands:
 
