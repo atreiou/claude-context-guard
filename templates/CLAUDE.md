@@ -44,4 +44,4 @@ The user can call `/audit` at ANY moment to verify your work. Every task must be
 
 After every approved plan is executed, archive it:
 1. Copy from `~/.claude/plans/` to `plans/S{session}-{seq}_{description}.md`
-2. Plans are cross-referenced by `/go` and `/audit` against the task registry
+2. Plans are cross-referenced by `/start` and `/audit` against the task registry

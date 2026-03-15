@@ -7,7 +7,7 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 
 # Context Guard — Session End (/end)
 
-The user wants to wrap up this session cleanly. Your job is to create a save point so the next session can pick up seamlessly via `/go`.
+The user wants to wrap up this session cleanly. Your job is to create a save point so the next session can pick up seamlessly via `/start`.
 
 ## Step 1: Gather Session Context
 
@@ -83,6 +83,6 @@ Present a summary:
 - Pushed to remote: ✅
 
 ### Next Session Pickup
-- [What /go will find when it runs next time]
+- [What /start will find when it runs next time]
 - [Any pending work to continue]
 ```

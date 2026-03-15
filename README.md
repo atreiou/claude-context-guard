@@ -10,25 +10,25 @@ Claude Code sessions get cut off by rate limits, context compaction, and crashes
 
 This is a known issue. [Anthropic's own engineering team](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) documented the same failure modes and recommended external state files as the solution.
 
-> **Note:** Context Guard is NOT the same as Claude Code's built-in "context compaction." Compaction is Claude Code's automatic process that compresses your conversation when it gets too long — it happens whether or not you have Context Guard installed. What Context Guard does is ensure that when compaction happens (or when you start a fresh session), nothing important gets lost. The `/go` command reads your safeguard files and rebuilds full context from them, so compaction becomes a non-event instead of a disaster.
+> **Note:** Context Guard is NOT the same as Claude Code's built-in "context compaction." Compaction is Claude Code's automatic process that compresses your conversation when it gets too long — it happens whether or not you have Context Guard installed. What Context Guard does is ensure that when compaction happens (or when you start a fresh session), nothing important gets lost. The `/start` command reads your safeguard files and rebuilds full context from them, so compaction becomes a non-event instead of a disaster.
 
 ## My Solution
 
 Context Guard creates a set of safeguard files that persist across sessions, plus three slash commands:
 
-- **`/go`** — Type this at the start of every session. Claude reads all safeguard files, cross-references recent plans against the task registry, flags any dropped or unexplained tasks, and summarises the project state. One command, full recovery.
+- **`/start`** — Type this at the start of every session. Claude reads all safeguard files, cross-references recent plans against the task registry, flags any dropped or unexplained tasks, and summarises the project state. One command, full recovery.
 
 - **`/audit`** — Your personal safeguard. Call this at ANY moment to verify Claude's work. It runs a comprehensive integrity check across all files, plans, and git state.
 
-- **`/end`** — Optional session save point. When you're done for the day, type `/end` and Claude will update all safeguard files, commit any uncommitted work, push to remote, and report a clean summary. Not required — `/go` handles recovery regardless — but useful when you want an explicit clean handoff.
+- **`/end`** — Optional session save point. When you're done for the day, type `/end` and Claude will update all safeguard files, commit any uncommitted work, push to remote, and report a clean summary. Not required — `/start` handles recovery regardless — but useful when you want an explicit clean handoff.
 
 ## Installation
 
 1. Copy the `.claude/` folder into your project root
 2. Copy the `templates/` folder into your project root
-3. Type `/go`
+3. Type `/start`
 
-That's it. On first run, `/go` detects this is a new project and sets everything up — copies templates, asks for your project name, and initialises the safeguard files.
+That's it. On first run, `/start` detects this is a new project and sets everything up — copies templates, asks for your project name, and initialises the safeguard files.
 
 ### What Gets Created
 
@@ -40,20 +40,20 @@ That's it. On first run, `/go` detects this is a new project and sets everything
 | `DECISIONS.md` | Architectural decisions register. The "why" behind every choice |
 | `COMMENTS.md` | Your verbatim comments logged as a safety net |
 | `FEATURE_LIST.json` | Pass/fail feature tracker (JSON — harder for LLMs to accidentally overwrite) |
-| `plans/` | Archived plans from every session, cross-referenced by /go and /audit |
+| `plans/` | Archived plans from every session, cross-referenced by /start and /audit |
 
 ### What Gets Configured
 
 | Component | Purpose |
 |-----------|---------|
-| `/go` skill | Session recovery — one command to restore full context |
+| `/start` skill | Session recovery — one command to restore full context |
 | `/audit` skill | On-demand integrity check — verify Claude's work at any moment |
 | `/end` skill | Optional session save point — clean wrap-up with commit and push |
 | Pre-commit hook | Reminds Claude to update safeguard files before every git commit |
 
 ## How It Works
 
-### Session Start (`/go`)
+### Session Start (`/start`)
 
 1. Reads all safeguard files (session log, task registry, decisions, comments, features)
 2. Reads the last 3 archived plans **in full**
@@ -64,7 +64,7 @@ That's it. On first run, `/go` detects this is a new project and sets everything
 
 ### On-Demand Audit (`/audit`)
 
-Everything `/go` does, plus:
+Everything `/start` does, plus:
 - Checks for stale in-progress tasks
 - Verifies decisions aren't contradicted
 - Checks for unarchived plans
@@ -81,7 +81,7 @@ When you're ready to stop working, type `/end`. Claude will:
 5. Verify clean git state
 6. Report a summary of the session and what's pending for next time
 
-This is entirely optional — `/go` will recover context regardless. But `/end` gives you a guaranteed clean save point.
+This is entirely optional — `/start` will recover context regardless. But `/end` gives you a guaranteed clean save point.
 
 ### Pre-Commit Safety
 

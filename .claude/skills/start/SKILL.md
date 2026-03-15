@@ -1,11 +1,11 @@
 ---
-name: go
-description: Session start and context recovery. Reads all safeguard files, cross-references plans against task registry, and summarises project state. Type /go at the start of every session.
+name: start
+description: Session start and context recovery. Reads all safeguard files, cross-references plans against task registry, and summarises project state. Type /start at the start of every session.
 disable-model-invocation: true
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
-# Context Guard — Session Recovery (/go)
+# Context Guard — Session Recovery (/start)
 
 You are starting or resuming a session. Follow these steps EXACTLY:
 
