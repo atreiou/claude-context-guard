@@ -14,13 +14,15 @@ This is a known issue. [Anthropic's own engineering team](https://www.anthropic.
 
 ## My Solution
 
-Context Guard creates a set of safeguard files that persist across sessions, plus three slash commands:
+Context Guard creates a set of safeguard files that persist across sessions, plus four slash commands:
 
 - **`/start`** — Type this at the start of every session. Claude reads all safeguard files, cross-references recent plans against the task registry, flags any dropped or unexplained tasks, and summarises the project state. One command, full recovery.
 
 - **`/audit`** — Your personal safeguard. Call this at ANY moment to verify Claude's work. It runs a comprehensive integrity check across all files, plans, and git state.
 
 - **`/end`** — Optional session save point. When you're done for the day, type `/end` and Claude will update all safeguard files, commit any uncommitted work, push to remote, and report a clean summary. Not required — `/start` handles recovery regardless — but useful when you want an explicit clean handoff.
+
+- **`/itemise`** — Apply the Itemisation Protocol to your code files. Numbers sections, functions, and meaningful blocks so every part of the code is referenceable by address. Backs up files first, verifies nothing changed except the added numbers, then removes backups. Can be toggled off in `CLAUDE.md` for projects that don't want it.
 
 ## Installation
 
@@ -49,6 +51,7 @@ That's it. On first run, `/start` detects this is a new project and sets everyth
 | `/start` skill | Session recovery — one command to restore full context |
 | `/audit` skill | On-demand integrity check — verify Claude's work at any moment |
 | `/end` skill | Optional session save point — clean wrap-up with commit and push |
+| `/itemise` skill | Itemisation Protocol — numbered code addressing with backup and integrity verification |
 | Pre-commit hook | Reminds Claude to update safeguard files before every git commit |
 
 ## How It Works
@@ -83,6 +86,49 @@ When you're ready to stop working, type `/end`. Claude will:
 
 This is entirely optional — `/start` will recover context regardless. But `/end` gives you a guaranteed clean save point.
 
+### Itemisation Protocol (`/itemise`)
+
+The Itemisation Protocol adds hierarchical section numbers to code files, making every block referenceable by address. Instead of loading an entire file into context, you can say "check section 2.3.1" and point directly to the relevant code.
+
+Numbers are added as comments using the correct syntax for each language:
+
+```php
+// 1. SECTION: Enqueue Scripts and Styles
+
+// 1.1 Enqueue parent theme stylesheet
+add_action('wp_enqueue_scripts', function() {
+    wp_enqueue_style('parent-style', get_template_directory_uri() . '/style.css');
+});
+// end of 1.1
+
+// 1.2 Conditional enqueue for calendar assets
+add_action('wp_enqueue_scripts', function() {
+    if (is_page('book-now') || is_page('booking-confirmation')) {
+        wp_enqueue_style('waypoint-calendar', get_stylesheet_directory_uri() . '/waypoint-calendar.css');
+        wp_enqueue_script('waypoint-calendar-js', get_stylesheet_directory_uri() . '/waypoint-calendar.js', [], null, true);
+
+        // 1.2.1 Localise script with AJAX URL, nonce, and slot config
+        wp_localize_script('waypoint-calendar-js', 'waypointData', array(
+            'ajaxUrl'    => admin_url('admin-ajax.php'),
+            'nonce'      => wp_create_nonce('waypoint_booking_nonce'),
+            // 1.2.1.1 Slot config: array of {label, start_h, start_m, end_h, end_m} objects
+            'slotConfig' => waypoint_get_slot_config(),
+        ));
+    }
+});
+// end of 1.2
+
+// end of 1
+```
+
+**What gets numbered:** sections, functions, significant conditionals, important loops, key config objects.
+**What doesn't:** variable declarations, single-line assignments, imports, trivial boilerplate.
+**Depth:** aim for 3 levels (`1.2.3`) in most cases, 4 only for genuinely complex nested config.
+
+**To disable:** set `ITEMISATION: disabled` in your project's `CLAUDE.md`. The `/itemise` command will halt before making any changes. Many developers won't want or need this protocol — the toggle is prominently placed at the top of the Itemisation Protocol section in `CLAUDE.md`.
+
+**Safety:** `/itemise` creates `{filename}.itemise-backup` copies before touching anything, verifies integrity after (strips added comment-numbers and diffs against the backup to confirm no code changed), and restores from backup on any failure.
+
 ### Pre-Commit Safety
 
 Before every git commit, a hook reminds Claude to update:
@@ -104,13 +150,14 @@ Examples: `S5-001_install-deps`, `S5-002_add-auth`, `S6-001_fix-login-bug`
 
 ## Design Principles
 
-I have been building (in practice,) this and another protocol which I am not sharing, for now, for quite some time. I am not a software engineer, just an avid AI user, but with Operational Analysis skills, I have over the last 3 years built what I consider the best context-rot defense out there, without even knowing why it works. I just had to figure out how to stop the problems all the LLMs kept making, without understanding why they are making them. Of course I have learneed all of that over the last year in particular now and it turns out I was right, and have been validated by the following, and genuinely hope the results of my 3 years of funmbling in the dark - that probably should be written into these models as standard - helps others like it now helps me:  [Anthropic's research](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) and the [Recursive Language Models paper](https://arxiv.org/abs/2512.24601) (MIT CSAIL):
+I have been building (in practice,) this and another protocol which I am not sharing, for now, for quite some time. I am not a software engineer, just an avid AI user, but with Operational Analysis skills, I have over the last 3 years built what I consider the best context-rot defense out there, without even knowing why it works. I just had to figure out how to stop the problems all the LLMs kept making, without understanding why they are making them. Of course I have learneed all of that over the last year in particular now and it turns out I was right, and have been validated by the following, and genuinely hope the results of my 3 years of funmbling in the dark - that probably should be written into these models as standard - helps others like it now helps me: [Anthropic's research](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) and the [Recursive Language Models paper](https://arxiv.org/abs/2512.24601) (MIT CSAIL):
 
 1. **External state over in-context memory** — files survive, context windows don't
 2. **JSON for structured data** — LLMs are less likely to accidentally overwrite JSON than markdown
 3. **Cross-referencing over trust** — verify plans against registries, don't assume tasks were completed
 4. **Minimal context loading** — read indexes first, fetch specifics only when needed
 5. **User can audit at any time** — transparency and accountability built in
+6. **Referenceable code** — every block has an address, LLMs don't need full file context to find it
 
 ## License
 

@@ -45,3 +45,49 @@ The user can call `/audit` at ANY moment to verify your work. Every task must be
 After every approved plan is executed, archive it:
 1. Copy from `~/.claude/plans/` to `plans/S{session}-{seq}_{description}.md`
 2. Plans are cross-referenced by `/start` and `/audit` against the task registry
+
+## Itemisation Protocol
+
+ITEMISATION: enabled
+
+The Itemisation Protocol adds hierarchical section numbers to code blocks so every part of the codebase is referenceable by address (e.g. "check section 2.3.1"). This reduces the context an LLM needs to load — instead of reading an entire file, you can point directly to the relevant block.
+
+**To disable:** change `ITEMISATION: enabled` to `ITEMISATION: disabled` above. The `/itemise` command will halt before making any changes.
+
+### What Gets Numbered
+
+Number logical **blocks** that serve as identifiable, referenceable units — not individual lines.
+
+- **Sections** — top-level logical groups: `// 1. SECTION: Name` ... `// end of 1`
+- **Functions and methods**: `// 1.1 functionName()` ... `// end of 1.1`
+- **Significant conditionals** — if/else/switch with meaningful business logic: `// 1.1.1 Description`
+- **Important loops** — for/while/foreach with non-trivial bodies: `// 1.1.2 Description`
+- **Key configuration objects** — complex arrays/objects passed to important calls: `// 1.2.1 Description`
+- **Notable parameters** within those, when the parameter itself calls a function or is complex: `// 1.2.1.1 Description`
+
+### What Does NOT Get Numbered
+
+- Individual variable declarations
+- Single-line assignments
+- Simple imports, requires, or use statements
+- Closing braces and trivial boilerplate
+- Anything already explained by its parent block's label
+
+### Comment Syntax by Language
+
+| Language | Format |
+|----------|--------|
+| JS, TS, PHP, Java, C#, Go | `// 1.1 Description` |
+| Python, Ruby, Shell, YAML | `# 1.1 Description` |
+| HTML, XML, Vue templates | `<!-- 1.1 Description -->` |
+| CSS, SCSS, Less | `/* 1.1 Description */` |
+| SQL | `-- 1.1 Description` |
+
+### Applying Itemisation to Existing Code
+
+Run `/itemise` to apply the protocol to existing files. The command will:
+1. Confirm the list of files before touching anything
+2. Create `{filename}.itemise-backup` copies
+3. Rewrite each file with numbering applied
+4. Verify integrity (strips added comment-numbers, diffs against backup — confirms no code changed)
+5. Delete backups on success; restore on failure
