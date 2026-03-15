@@ -48,7 +48,17 @@ Execute ALL checks below and report findings.
 - Check `~/.claude/plans/` for any plan files not yet copied to `plans/`
 - Flag unarchived plans as **NEEDS ARCHIVING**
 
-## 8. File Integrity
+## 8. Safeguard File Existence
+- Verify ALL safeguard files exist at their expected paths and are non-empty:
+  - `SESSION_LOG.md`
+  - `TASK_REGISTRY.md`
+  - `DECISIONS.md`
+  - `COMMENTS.md`
+  - `FEATURE_LIST.json`
+  - `CLAUDE.md`
+- **CRITICAL** if any file is missing or empty
+
+## 9. File Integrity
 - Count key files (agents, skills, etc. — project-specific)
 - Check for orphaned files not in any index
 - Run any project-specific grep checks from CLAUDE.md
@@ -58,28 +68,26 @@ Execute ALL checks below and report findings.
 ```
 ## Audit Report — [timestamp]
 
-### Passing Checks ✅
+### Passing Checks
 - [list of checks that passed]
 
 ### Issues Found
 
 **Issue 1: [severity] — [description]**
 - Details: [what's wrong]
-- Fix: [what fixing it would do]
-- → **[FIX]** or **[IGNORE]**?
+- Fix: [what to do about it]
 
 **Issue 2: [severity] — [description]**
 - Details: [what's wrong]
-- Fix: [what fixing it would do]
-- → **[FIX]** or **[IGNORE]**?
+- Fix: [what to do about it]
 
 [...repeat for each issue independently...]
 ```
 
 ### Issue Resolution Rules
 
-1. Present EVERY issue independently — the user chooses fix or ignore for EACH one separately
-2. Severity levels: 🔴 CRITICAL, 🟡 WARNING, 🔵 INFO
+1. Present EVERY issue independently — the user chooses which to fix or ignore
+2. Severity levels: CRITICAL, WARNING, INFO
 3. After the user responds, fix ONLY the issues they chose to fix
 4. Ignored issues are NOT logged as failures — the user made a conscious choice
 5. If there are zero issues, just show the passing checks and confirm "All clear"
