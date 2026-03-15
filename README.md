@@ -10,13 +10,17 @@ Claude Code sessions get cut off by rate limits, context compaction, and crashes
 
 This is a known issue. [Anthropic's own engineering team](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) documented the same failure modes and recommended external state files as the solution.
 
+> **Note:** Context Guard is NOT the same as Claude Code's built-in "context compaction." Compaction is Claude Code's automatic process that compresses your conversation when it gets too long — it happens whether or not you have Context Guard installed. What Context Guard does is ensure that when compaction happens (or when you start a fresh session), nothing important gets lost. The `/go` command reads your safeguard files and rebuilds full context from them, so compaction becomes a non-event instead of a disaster.
+
 ## My Solution
 
-Context Guard creates a set of safeguard files that persist across sessions, plus two slash commands:
+Context Guard creates a set of safeguard files that persist across sessions, plus three slash commands:
 
 - **`/go`** — Type this at the start of every session. Claude reads all safeguard files, cross-references recent plans against the task registry, flags any dropped or unexplained tasks, and summarises the project state. One command, full recovery.
 
 - **`/audit`** — Your personal safeguard. Call this at ANY moment to verify Claude's work. It runs a comprehensive integrity check across all files, plans, and git state.
+
+- **`/end`** — Optional session save point. When you're done for the day, type `/end` and Claude will update all safeguard files, commit any uncommitted work, push to remote, and report a clean summary. Not required — `/go` handles recovery regardless — but useful when you want an explicit clean handoff.
 
 ## Installation
 
@@ -44,6 +48,7 @@ That's it. On first run, `/go` detects this is a new project and sets everything
 |-----------|---------|
 | `/go` skill | Session recovery — one command to restore full context |
 | `/audit` skill | On-demand integrity check — verify Claude's work at any moment |
+| `/end` skill | Optional session save point — clean wrap-up with commit and push |
 | Pre-commit hook | Reminds Claude to update safeguard files before every git commit |
 
 ## How It Works
@@ -65,6 +70,18 @@ Everything `/go` does, plus:
 - Checks for unarchived plans
 - File integrity checks
 - Reports passing, warnings, and critical issues
+
+### Session End (`/end`) — Optional
+
+When you're ready to stop working, type `/end`. Claude will:
+1. Review everything done this session
+2. Update all safeguard files (session log, task registry, comments, decisions, features)
+3. Archive any unarchived plans
+4. Commit and push all changes
+5. Verify clean git state
+6. Report a summary of the session and what's pending for next time
+
+This is entirely optional — `/go` will recover context regardless. But `/end` gives you a guaranteed clean save point.
 
 ### Pre-Commit Safety
 

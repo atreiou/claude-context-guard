@@ -46,7 +46,8 @@ Execute ALL checks below and report findings.
 
 ## 7. Unarchived Plans
 - Check `~/.claude/plans/` for any plan files not yet copied to `plans/`
-- Flag unarchived plans as **NEEDS ARCHIVING**
+- **IMPORTANT:** `~/.claude/plans/` is SHARED across all Claude Code projects. Only flag plans that are clearly related to THIS project (e.g. contain the project name in the content or match this project's naming convention). Ignore plans from other projects entirely — do NOT report them.
+- Flag relevant unarchived plans as **NEEDS ARCHIVING**
 
 ## 8. Safeguard File Existence
 - Verify ALL safeguard files exist at their expected paths and are non-empty:
