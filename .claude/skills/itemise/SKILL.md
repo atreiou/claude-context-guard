@@ -42,7 +42,19 @@ Report: "Backups created for N files."
 
 ## Step 4: Apply Itemisation
 
-Process each file one at a time. Read the file, then rewrite it with the numbering applied. Use the correct comment syntax for the language:
+**MANDATORY: Use the Edit tool to insert itemisation comments, NOT the Write tool.**
+
+Process each file one at a time. Read the file in full first, then plan all the itemisation labels and end markers you will add. Apply them using **only the Edit tool** — one insertion at a time (or in small batches where edits don't overlap). This ensures every existing character in the file is structurally preserved; you are only ever inserting new lines, never rewriting the file.
+
+**Why Edit, not Write:** When the Write tool rewrites an entire file, it is easy to accidentally merge, paraphrase, or drop existing comments. The Edit tool makes this structurally impossible — if the `old_string` matches, the surrounding content is untouched.
+
+**Workflow per file:**
+1. Read the file in full
+2. Decide where each itemisation label and end marker goes
+3. Use Edit to insert each label/marker. The `old_string` should be the existing line(s) at the insertion point, and `new_string` should be those same lines with the new comment line(s) prepended or appended. Never omit any part of `old_string` from `new_string`.
+4. After all edits, proceed to Step 5 (verification)
+
+Use the correct comment syntax for the language:
 
 | Language | Comment syntax |
 |----------|---------------|
@@ -120,6 +132,13 @@ CRITICAL: Itemisation ONLY ADDS new comment lines. It NEVER removes, replaces, o
 - If a code block already has a comment above it, add the itemisation label on a NEW line above the existing comment
 - If a line has an inline comment, leave it untouched
 - The itemisation label and the original comment are separate concerns — both must appear in the output
+- **NEVER use the Write tool to apply itemisation.** The Edit tool is mandatory (see Step 4). Write rewrites the entire file and makes it easy to accidentally merge or drop existing comments. Edit structurally prevents this.
+
+**The most common mistake:** seeing an existing comment like `# Copy skills` and "absorbing" it into the itemisation label as `# 4.1 Copy skills`, dropping the original line. This is WRONG. The correct output has BOTH lines:
+```
+# 4.1 Copy skills
+# Copy skills
+```
 
 Example — WRONG (existing comment replaced with itemisation label):
 
@@ -150,7 +169,14 @@ if [[ "$COMMAND" == *"git commit"* ]]; then
 ```
 The original comment `# Only trigger on git commit commands` is still there, verbatim.
 
-Removing, altering, or rewriting ANY existing character in the file — whether code or comment — is a catastrophic failure. The verification step (Step 5) will catch this, but prevention is better than cure.
+**How to apply this with Edit:** The `old_string` is the existing comment + code line. The `new_string` is the new itemisation label + the same existing comment + the same code line. Every character of `old_string` must appear in `new_string`.
+
+```
+old_string: "# Only trigger on git commit commands\nif [[ \"$COMMAND\" == *\"git commit\"* ]]; then"
+new_string: "# 2.1 Display checklist if git commit detected\n# Only trigger on git commit commands\nif [[ \"$COMMAND\" == *\"git commit\"* ]]; then"
+```
+
+Removing, altering, or rewriting ANY existing character in the file — whether code or comment — is a catastrophic failure. The verification step (Step 5) will catch this, but the Edit-based approach prevents it structurally.
 
 ## Step 5: Verify Integrity
 

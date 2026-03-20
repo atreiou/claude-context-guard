@@ -3,9 +3,12 @@
 # Reminds Claude to update safeguard files before every git commit
 # Runs as a PreToolUse hook on Bash commands
 
+# 1. SECTION: Input parsing
 INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
+# end of 1
 
+# 2. SECTION: Commit detection and checklist
 # Only trigger on git commit commands
 if [[ "$COMMAND" == *"git commit"* ]]; then
   echo "PRE-COMMIT CHECK: Before committing, ensure you have:" >&2
@@ -16,6 +19,7 @@ if [[ "$COMMAND" == *"git commit"* ]]; then
   echo "  5. Archived any approved plans to plans/ directory" >&2
   echo "  If all are current, proceed. If not, update them FIRST." >&2
 fi
+# end of 2
 
 # Always allow — this is a reminder, not a blocker
 exit 0
