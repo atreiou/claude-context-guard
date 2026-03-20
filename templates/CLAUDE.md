@@ -91,3 +91,39 @@ Run `/itemise` to apply the protocol to existing files. The command will:
 3. Rewrite each file with numbering applied
 4. Verify integrity (strips added comment-numbers, diffs against backup — confirms no code changed)
 5. Delete backups on success; restore on failure
+
+### Cross-References
+
+When a section calls a function or method defined in another numbered section of the same file, the marker includes a `[calls: N.M]` tag:
+
+```
+// 3.2 handlePayment() [calls: 1.1, 2.3]
+```
+
+- Only track function/method calls, not shared variables or implicit dependencies
+- Multiple calls are comma-separated: `[calls: 1.1, 2.3, 5.1]`
+- Cross-references are scoped to the same file — cross-file dependencies are out of scope
+- References are refreshed automatically when `/itemise` is re-run
+
+### Reading Specific Sections
+
+For itemised files over ~100 lines, prefer targeted section reads over loading the full file. The section markers are grep-friendly anchors that cannot go stale.
+
+**To read a specific section (e.g. section 4.2):**
+
+1. Grep for the start marker to get its line number
+2. Grep for the end marker (`end of 4.2`) to get its line number
+3. Use `Read(file_path, offset=START_LINE, limit=END_LINE - START_LINE + 1)` to load just that section
+
+**If no end marker exists** (short blocks skip them per the protocol), read 20 lines from the start marker and look for the next numbered marker to determine the boundary.
+
+**Nested sections:** Reading a parent section (e.g. `4`) via its start/end markers includes all children (`4.1`, `4.2`, etc.). To read only the parent's preamble, read from the `4` marker to the `4.1` marker.
+
+### Impact Advisories
+
+When modifying a section, grep the file for `[calls: N.M]` references pointing to it. If other sections depend on the one being changed, flag this to the user:
+
+- "Section 4.2 calls this function — check if it needs updating too"
+- "This feature is linked with section 3.1 — consider adding a task to update it"
+
+This is advisory, not blocking — mention it and move on. The agent may already be aware of the dependency; that's fine. The check costs nothing and occasionally prevents a missed update.

@@ -52,7 +52,8 @@ Process each file one at a time. Read the file in full first, then plan all the 
 1. Read the file in full
 2. Decide where each itemisation label and end marker goes
 3. Use Edit to insert each label/marker. The `old_string` should be the existing line(s) at the insertion point, and `new_string` should be those same lines with the new comment line(s) prepended or appended. Never omit any part of `old_string` from `new_string`.
-4. After all edits, proceed to Step 5 (verification)
+4. Check for cross-references: if the section body calls a function/method defined in another numbered section of the same file, append `[calls: N.M]` to the marker (e.g. `// 3.2 handlePayment() [calls: 1.1, 2.3]`)
+5. After all edits, proceed to Step 5 (verification)
 
 Use the correct comment syntax for the language:
 
@@ -224,4 +225,11 @@ If any file failed:
 ### Notes
 - Run /itemise again after significant code changes to renumber
 - Disable with ITEMISATION: disabled in CLAUDE.md
+
+### Usage Tip
+- For large files, grep for `# N.M` to find a section's start line and `# end of N.M`
+  for its end line, then use Read with offset/limit to load just that section.
+- When modifying a section, grep the file for `[calls: N.M]` references pointing to it.
+  If other sections depend on the one you're changing, flag it to the user as an advisory.
+- See "Reading Specific Sections" and "Impact Advisories" in CLAUDE.md for full details.
 ```
