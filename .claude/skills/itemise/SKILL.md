@@ -113,16 +113,54 @@ Add `// end of N` markers for:
 
 Skip end markers on very short blocks (2–3 lines) where the closing brace makes the boundary obvious.
 
+### Preserving Existing Comments
+
+CRITICAL: Itemisation ONLY ADDS new comment lines. It NEVER removes, replaces, or rewrites existing comments or code.
+
+- If a code block already has a comment above it, add the itemisation label on a NEW line above the existing comment
+- If a line has an inline comment, leave it untouched
+- The itemisation label and the original comment are separate concerns — both must appear in the output
+
+Example — WRONG (existing comment replaced with itemisation label):
+
+Original code:
+```
+# Only trigger on git commit commands
+if [[ "$COMMAND" == *"git commit"* ]]; then
+```
+Wrong output (original comment deleted, replaced by itemisation label):
+```
+# 2.1 Check if command is a git commit
+if [[ "$COMMAND" == *"git commit"* ]]; then
+```
+The original comment `# Only trigger on git commit commands` has been destroyed.
+
+Example — RIGHT (itemisation label added, every original character preserved):
+
+Original code:
+```
+# Only trigger on git commit commands
+if [[ "$COMMAND" == *"git commit"* ]]; then
+```
+Correct output (new label inserted above, original comment untouched):
+```
+# 2.1 Display checklist if git commit detected
+# Only trigger on git commit commands
+if [[ "$COMMAND" == *"git commit"* ]]; then
+```
+The original comment `# Only trigger on git commit commands` is still there, verbatim.
+
+Removing, altering, or rewriting ANY existing character in the file — whether code or comment — is a catastrophic failure. The verification step (Step 5) will catch this, but prevention is better than cure.
+
 ## Step 5: Verify Integrity
 
 After rewriting each file, compare it to its backup to confirm that ONLY comment-number lines were added and NO actual code was changed.
 
-Run this check for each file (adapt comment pattern to the language):
+Run this check for each file (adapt comment pattern to the language). Line endings are normalised with `tr -d '\r'` to prevent false failures on Windows (the Write tool outputs LF, but backups may preserve CRLF):
 
 ```bash
-# Strip itemisation comment lines from the new file, then diff against backup
-grep -Ev "^\s*(\/\/|#)\s+[0-9]+(\.[0-9]+)*(\s|\.)|^\s*(\/\/|#)\s+end of\s+[0-9]" "{filename}" > /tmp/itemise-check
-diff /tmp/itemise-check "{filename}.itemise-backup"
+# Strip itemisation comment lines, normalise line endings, then diff against backup
+diff <(grep -Ev "^\s*(\/\/|#)\s+[0-9]+(\.[0-9]+)*(\s|\.)|^\s*(\/\/|#)\s+end of\s+[0-9]" "{filename}" | tr -d '\r') <(tr -d '\r' < "{filename}.itemise-backup")
 ```
 
 - If `diff` produces no output: **PASS** — only comment lines were added
