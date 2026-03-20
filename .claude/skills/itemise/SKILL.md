@@ -91,7 +91,7 @@ Process each file one at a time. Read the file, then rewrite it with the numberi
 
 **Do NOT number these:**
 
-- Individual variable declarations (`$count = 0;`, `let name = 'Rob';`)
+- Individual variable declarations (`$count = 0;`, `let name = 'Alice';`)
 - Single-line assignments
 - Simple imports, requires, includes, use statements
 - Closing braces or trivial boilerplate

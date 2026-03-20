@@ -26,11 +26,30 @@ Context Guard creates a set of safeguard files that persist across sessions, plu
 
 ## Installation
 
+### Option 1: One-Command Install
+
+```bash
+git clone https://github.com/atreiou/claude-context-guard.git
+cd claude-context-guard
+./install.sh /path/to/your/project
+```
+
+> **Windows users:** Run this in Git Bash or WSL, not PowerShell or CMD.
+
+### Option 2: Manual Install
+
 1. Copy the `.claude/` folder into your project root
 2. Copy the `templates/` folder into your project root
-3. Type `/start`
 
-That's it. On first run, `/start` detects this is a new project and sets everything up — copies templates, asks for your project name, and initialises the safeguard files.
+### First Run
+
+Open Claude Code in your project and type `/start`. On first run, it will:
+1. Detect this is a new project (no safeguard files yet)
+2. Ask for your project name and description
+3. Create all safeguard files from the templates
+4. Offer to run `/itemise` for numbered code addressing (optional)
+
+From then on, `/start` reads your existing safeguard files and recovers full context — one command, full recovery.
 
 ### What Gets Created
 
@@ -104,15 +123,15 @@ add_action('wp_enqueue_scripts', function() {
 // 1.2 Conditional enqueue for calendar assets
 add_action('wp_enqueue_scripts', function() {
     if (is_page('book-now') || is_page('booking-confirmation')) {
-        wp_enqueue_style('waypoint-calendar', get_stylesheet_directory_uri() . '/waypoint-calendar.css');
-        wp_enqueue_script('waypoint-calendar-js', get_stylesheet_directory_uri() . '/waypoint-calendar.js', [], null, true);
+        wp_enqueue_style('app-calendar', get_stylesheet_directory_uri() . '/app-calendar.css');
+        wp_enqueue_script('app-calendar-js', get_stylesheet_directory_uri() . '/app-calendar.js', [], null, true);
 
         // 1.2.1 Localise script with AJAX URL, nonce, and slot config
-        wp_localize_script('waypoint-calendar-js', 'waypointData', array(
+        wp_localize_script('app-calendar-js', 'appData', array(
             'ajaxUrl'    => admin_url('admin-ajax.php'),
-            'nonce'      => wp_create_nonce('waypoint_booking_nonce'),
+            'nonce'      => wp_create_nonce('app_booking_nonce'),
             // 1.2.1.1 Slot config: array of {label, start_h, start_m, end_h, end_m} objects
-            'slotConfig' => waypoint_get_slot_config(),
+            'slotConfig' => get_slot_config(),
         ));
     }
 });
