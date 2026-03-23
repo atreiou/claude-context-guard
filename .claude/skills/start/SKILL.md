@@ -20,6 +20,8 @@ Try to read `CLAUDE.md` in the project root.
 
 ### First-Run Setup
 
+**IMPORTANT: First-run setup is procedural, not a design task. Do NOT enter plan mode. Proceed directly with creating safeguard files. If plan mode is active, exit it before continuing.**
+
 1. **Check for templates:** Look for a `templates/` folder in the project root. If it doesn't exist, tell the user: "No templates/ folder found. Please run install.sh first or copy the templates/ folder from the Context Guard repo." Then stop.
 
 2. **Ask for project details:**

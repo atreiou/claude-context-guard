@@ -27,8 +27,8 @@ Wait for their answer. Then list the exact files you will process and ask them t
 
 Before creating backups, scan each file for lines matching the pattern `// N.` or `# N.` (itemisation numbers). If any file already has itemisation numbers:
 
-- Warn the user: "This file appears to already be itemised. Re-running will renumber everything from scratch."
-- Ask if they want to continue or skip that file.
+- **If the user invoked `/itemise --force` or `/itemise force`:** skip this warning entirely. Proceed with re-itemisation without prompting.
+- **Otherwise:** warn the user: "This file appears to already be itemised. Re-running will renumber everything from scratch." Ask if they want to continue or skip that file.
 
 ## Step 3: Create Backups
 
@@ -40,13 +40,17 @@ cp "{filename}" "{filename}.itemise-backup"
 
 Report: "Backups created for N files."
 
+**CRLF note (Windows):** The Edit tool outputs LF line endings, but the backup preserves the file's original line endings (which may be CRLF on Windows). The verification command in Step 5 normalises line endings with `tr -d '\r'` on both sides to prevent false diff failures. No manual intervention is needed, but be aware that after itemisation, the file will have LF endings even if it originally had CRLF.
+
 ## Step 4: Apply Itemisation
 
 **MANDATORY: Use the Edit tool to insert itemisation comments, NOT the Write tool.**
 
+**DO NOT reorganise, move, reorder, or restructure any code during itemisation.** Itemisation is a labelling pass only. Number the code in the order it already appears. If the code would make more logical sense in a different order, that is a separate refactoring task — never combine it with itemisation. Attempting to move functions between sections while inserting labels is how code gets duplicated or corrupted.
+
 Process each file one at a time. Read the file in full first, then plan all the itemisation labels and end markers you will add. Apply them using **only the Edit tool** — one insertion at a time (or in small batches where edits don't overlap). This ensures every existing character in the file is structurally preserved; you are only ever inserting new lines, never rewriting the file.
 
-**Why Edit, not Write:** When the Write tool rewrites an entire file, it is easy to accidentally merge, paraphrase, or drop existing comments. The Edit tool makes this structurally impossible — if the `old_string` matches, the surrounding content is untouched.
+**Why Edit, not Write:** When the Write tool rewrites an entire file, it is easy to accidentally merge, paraphrase, or drop existing comments. The Edit tool makes this structurally impossible — if the `old_string` matches, the surrounding content is untouched. *(Validated in Session 1: Write caused comment merging and content loss; Edit eliminated all such failures.)*
 
 **Workflow per file:**
 1. Read the file in full
@@ -54,6 +58,22 @@ Process each file one at a time. Read the file in full first, then plan all the 
 3. Use Edit to insert each label/marker. The `old_string` should be the existing line(s) at the insertion point, and `new_string` should be those same lines with the new comment line(s) prepended or appended. Never omit any part of `old_string` from `new_string`.
 4. Check for cross-references: if the section body calls a function/method defined in another numbered section of the same file, append `[calls: N.M]` to the marker (e.g. `// 3.2 handlePayment() [calls: 1.1, 2.3]`)
 5. After all edits, proceed to Step 5 (verification)
+
+### Large File Handling (500+ lines)
+
+Files over 500 lines MUST be delegated to a sub-agent. Direct editing of large files is error-prone when there are 30+ insertion points — Session 1 confirmed this when `config.py` was corrupted by a mismatched edit boundary.
+
+**Sub-agent workflow:**
+1. Read the file in full and determine all insertion points (label text + target line)
+2. Launch a sub-agent (using the Agent tool) with these strict instructions:
+   - "Apply itemisation comments to {filename} using ONLY the Edit tool"
+   - "Insert these specific labels at these specific locations: [provide the full list]"
+   - "Work bottom-to-top to avoid line number shifts"
+   - "Do NOT use Write. Do NOT modify any existing code or comments."
+3. After the sub-agent completes, proceed to Step 5 verification as normal
+4. If the sub-agent fails (rate limit, timeout), log remaining insertions and retry
+
+For files under 500 lines, proceed with direct editing as described above.
 
 Use the correct comment syntax for the language:
 
@@ -183,14 +203,17 @@ Removing, altering, or rewriting ANY existing character in the file — whether 
 
 After rewriting each file, compare it to its backup to confirm that ONLY comment-number lines were added and NO actual code was changed.
 
-Run this check for each file (adapt comment pattern to the language). Line endings are normalised with `tr -d '\r'` to prevent false failures on Windows (the Write tool outputs LF, but backups may preserve CRLF):
+Run this check for each file (adapt comment pattern to the language). The command:
+1. Strips itemisation comment lines from **both** the current file and the backup (handles re-itemisation of already-itemised files)
+2. Normalises CRLF to LF on both sides (prevents false failures on Windows)
+3. Ignores blank line differences with `diff -B` (inserting comment blocks inevitably shifts blank lines)
 
 ```bash
-# Strip itemisation comment lines, normalise line endings, then diff against backup
-diff <(grep -Ev "^\s*(\/\/|#)\s+[0-9]+(\.[0-9]+)*(\s|\.)|^\s*(\/\/|#)\s+end of\s+[0-9]" "{filename}" | tr -d '\r') <(tr -d '\r' < "{filename}.itemise-backup")
+PATTERN="^\s*(\/\/|#)\s+[0-9]+(\.[0-9]+)*(\s|\.).*|^\s*(\/\/|#)\s+end of\s+[0-9]"
+diff -B <(grep -Ev "$PATTERN" "{filename}" | tr -d '\r') <(grep -Ev "$PATTERN" "{filename}.itemise-backup" | tr -d '\r')
 ```
 
-- If `diff` produces no output: **PASS** — only comment lines were added
+- If `diff` produces no output: **PASS** — only comment lines (and cosmetic blank lines) were added
 - If `diff` produces output: **FAIL** — actual code was changed
 
 Report pass/fail for each file. On any FAIL, immediately restore the backup:
@@ -226,7 +249,7 @@ If any file failed:
 - Run /itemise again after significant code changes to renumber
 - Disable with ITEMISATION: disabled in CLAUDE.md
 
-### Usage Tip
+### Usage Tips
 - For large files, grep for `# N.M` to find a section's start line and `# end of N.M`
   for its end line, then use Read with offset/limit to load just that section.
 - When modifying a section, grep the file for `[calls: N.M]` references pointing to it.
