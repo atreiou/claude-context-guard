@@ -9,6 +9,15 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 
 The user wants to wrap up this session cleanly. Your job is to create a save point so the next session can pick up seamlessly via `/start`.
 
+## Step 0: Verify Completeness Before Saving
+
+Before saving, verify nothing has been missed this session:
+- Are there any user comments from this session NOT yet in COMMENTS.md?
+- Are there any tasks worked on NOT yet updated in TASK_REGISTRY.md?
+- Review the conversation for any decisions made but not logged in DECISIONS.md
+
+If anything is missing, log it BEFORE proceeding to Step 1.
+
 ## Step 1: Gather Session Context
 
 Review what was done this session:

@@ -103,6 +103,22 @@ Run: `git log --oneline --decorate -10 && echo "===" && git status && echo "==="
 
 Report: any uncommitted files, any unpushed commits.
 
+## Step 2.5: Detect Unlogged Sessions
+
+After checking git state, detect potential orphaned work:
+
+1. Get the date of the last session entry in SESSION_LOG.md
+2. Get the date of the most recent git commit: `git log -1 --format=%ci`
+3. If the last commit is AFTER the last session log date, warn:
+
+> ⚠️ **ORPHANED SESSION DETECTED**
+> Last session logged: S[N] on [date]
+> Last git commit: [hash] on [date] — "[message]"
+> Work was done after the last logged session. This may mean a session ended without /end.
+> Recommend: Review git log and reconstruct the missing session entry.
+
+If the dates match or the session log is current, continue normally.
+
 ## Step 3: Cross-Reference Plans
 
 Read the **last 3 plan files** from the `plans/` directory IN FULL.

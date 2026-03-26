@@ -25,6 +25,28 @@ Every comment the user makes in conversation MUST be logged verbatim in `COMMENT
 
 The user can call `/audit` at ANY moment to verify your work. Every task must be traceable back to a plan, a decision, or a user comment. Unexplained work WILL be flagged. Be prepared for this at all times.
 
+## AUTO-CHECKPOINT PROTOCOL
+
+Update safeguard files (SESSION_LOG.md, TASK_REGISTRY.md, COMMENTS.md) IMMEDIATELY after:
+- Any task status change (completed/failed/blocked)
+- Any new decision is made
+- Every 3-4 user messages (batch update)
+- Before any potentially long operation (testing, uploads, large code generation)
+- When conversation is getting very long (approaching context limits)
+
+Do NOT wait for /end. Treat safeguard files as a running log, updated incrementally.
+
+## CONTEXT OVERFLOW PROTOCOL
+
+If the conversation is getting very long:
+1. IMMEDIATELY update all safeguard files with current progress
+2. Tell the user: "Context is getting large. I've saved all progress to safeguard files. If I lose context, run /start to recover."
+3. Continue working but update safeguard files after every significant action
+
+## SAVE FREQUENCY
+
+After every significant block of work (completing a task, fixing a bug, making a decision, receiving user feedback), append to SESSION_LOG.md and update TASK_REGISTRY.md. The /end command is a CLEAN save — but incremental saves should happen throughout the session. If context is lost mid-session, the safeguard files should contain 90%+ of what happened.
+
 ## Project Overview
 
 **Project:** {PROJECT_NAME}
