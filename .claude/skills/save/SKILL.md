@@ -35,7 +35,11 @@ Check and update ALL of these:
 - If an entry already exists, append a checkpoint marker:
   ```
   **Checkpoint [HH:MM]:** [brief summary of progress since last save]
+  **In flight:** [what is actively being worked on right now — the approach, current state, and next micro-step]
   ```
+- The "In flight" line is critical — if context is lost after this save, this is what the next session reads to understand exactly where you were mid-thought. Write it like a handoff note to yourself.
+- If any significant errors or blockers were hit since the last save, add: `**Error fixed:** [what happened and how it was resolved]`
+- If the user has expressed what they want done next, add: `**Next step:** [user's intent in their own words]`
 - Do NOT close out the session entry — work is continuing
 
 ### TASK_REGISTRY.md

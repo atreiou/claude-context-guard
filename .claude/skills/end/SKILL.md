@@ -33,6 +33,8 @@ Check and update ALL of these:
 ### SESSION_LOG.md
 - Add an entry for this session (or update the existing one)
 - Include: what happened, commits made, tasks completed, tasks remaining
+- **Next step:** Capture what the user wants done next, using their own words where possible. Not just a list of pending tasks — the actual direction, priority, and intent. This is what the next session's /start will read to understand where to pick up.
+- **Errors encountered:** If any significant errors, blockers, or unexpected issues were hit during the session, log what happened and how it was resolved. Skip this if nothing notable occurred — don't force empty sections. This prevents future sessions from repeating the same mistakes.
 
 ### TASK_REGISTRY.md
 - Log any new tasks created this session

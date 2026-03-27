@@ -35,11 +35,11 @@ Update safeguard files (SESSION_LOG.md, TASK_REGISTRY.md, COMMENTS.md) IMMEDIATE
 - When conversation is getting very long (approaching context limits)
 - Or when the user runs `/save` to manually trigger a checkpoint
 
-Do NOT wait for /end. Treat safeguard files as a running log, updated incrementally.
+Do NOT wait for /end. Treat safeguard files as a running log, updated incrementally. When saving, capture not just what was completed but what is **in flight** — the current approach, state, and next micro-step. If context is lost, this is the handoff note.
 
 ## AUTOMATIC PRE-COMPACTION SAVE
 
-A PreCompact hook is installed that fires BEFORE Claude Code compresses the conversation. When it fires, you will see a notification: "Context Guard — Auto-saving before compaction." When this triggers, you MUST update all safeguard files with current progress BEFORE compaction proceeds. This is your last chance to preserve details that will be lost to compression. Follow the /save steps: update SESSION_LOG.md (with checkpoint marker noting "auto-save before compaction"), TASK_REGISTRY.md, COMMENTS.md, DECISIONS.md, and FEATURE_LIST.json.
+A PreCompact hook is installed that fires BEFORE Claude Code compresses the conversation. When it fires, you will see a notification: "Context Guard — Auto-saving before compaction." When this triggers, you MUST update all safeguard files with current progress BEFORE compaction proceeds. This is your last chance to preserve details that will be lost to compression. Follow the /save steps: update SESSION_LOG.md (with checkpoint marker noting "auto-save before compaction" and an **"In flight"** line capturing exactly what you were working on, the approach, and the next step), TASK_REGISTRY.md, COMMENTS.md, DECISIONS.md, and FEATURE_LIST.json.
 
 ## CONTEXT OVERFLOW PROTOCOL
 
@@ -50,7 +50,7 @@ If the conversation is getting very long:
 
 ## SAVE FREQUENCY
 
-After every significant block of work (completing a task, fixing a bug, making a decision, receiving user feedback), append to SESSION_LOG.md and update TASK_REGISTRY.md. The /end command is a CLEAN save — but incremental saves should happen throughout the session. The user can also run /save at any time to trigger an explicit mid-session checkpoint. If context is lost mid-session, the safeguard files should contain 90%+ of what happened.
+After every significant block of work (completing a task, fixing a bug, making a decision, receiving user feedback), append to SESSION_LOG.md and update TASK_REGISTRY.md. The /end command is a CLEAN save — but incremental saves should happen throughout the session. The user can also run /save at any time to trigger an explicit mid-session checkpoint. If context is lost mid-session, the safeguard files should contain 90%+ of what happened. When saving, always capture: (1) what was done, (2) what is in flight right now, (3) what the user wants next, and (4) any errors hit and how they were resolved. These four elements make the difference between a useful handoff and a stale status update.
 
 ## Project Overview
 
