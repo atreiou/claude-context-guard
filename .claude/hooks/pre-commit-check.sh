@@ -17,7 +17,7 @@ if [[ "$COMMAND" == *"git commit"* ]]; then
   echo "  3. Updated SESSION_LOG.md if this is a significant milestone" >&2
   echo "  4. Updated FEATURE_LIST.json if any feature status changed" >&2
   echo "  5. Archived any approved plans to plans/ directory" >&2
-  echo "  If all are current, proceed. If not, update them FIRST." >&2
+  echo "  (This is a reminder — the commit will proceed either way.)" >&2
 fi
 # end of 2
 

@@ -27,7 +27,7 @@ Wait for their answer. Then list the exact files you will process and ask them t
 
 Before creating backups, scan each file for lines matching the pattern `// N.` or `# N.` (itemisation numbers). If any file already has itemisation numbers:
 
-- **If the user invoked `/itemise --force` or `/itemise force`:** skip this warning entirely. Proceed with re-itemisation without prompting.
+- **If the user invoked `/itemise force`:** skip this warning entirely. Proceed with re-itemisation without prompting.
 - **Otherwise:** warn the user: "This file appears to already be itemised. Re-running will renumber everything from scratch." Ask if they want to continue or skip that file.
 
 ## Step 3: Create Backups
@@ -209,7 +209,7 @@ Run this check for each file (adapt comment pattern to the language). The comman
 3. Ignores blank line differences with `diff -B` (inserting comment blocks inevitably shifts blank lines)
 
 ```bash
-PATTERN="^\s*(\/\/|#)\s+[0-9]+(\.[0-9]+)*(\s|\.).*|^\s*(\/\/|#)\s+end of\s+[0-9]"
+PATTERN="^\s*(\/\/|#)\s+[0-9]+(\.[0-9]+)*(\s|\.).*|^\s*(\/\/|#)\s+end of\s+[0-9]+"
 diff -B <(grep -Ev "$PATTERN" "{filename}" | tr -d '\r') <(grep -Ev "$PATTERN" "{filename}.itemise-backup" | tr -d '\r')
 ```
 
