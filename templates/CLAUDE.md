@@ -37,6 +37,10 @@ Update safeguard files (SESSION_LOG.md, TASK_REGISTRY.md, COMMENTS.md) IMMEDIATE
 
 Do NOT wait for /end. Treat safeguard files as a running log, updated incrementally.
 
+## AUTOMATIC PRE-COMPACTION SAVE
+
+A PreCompact hook is installed that fires BEFORE Claude Code compresses the conversation. When it fires, you will see a notification: "Context Guard — Auto-saving before compaction." When this triggers, you MUST update all safeguard files with current progress BEFORE compaction proceeds. This is your last chance to preserve details that will be lost to compression. Follow the /save steps: update SESSION_LOG.md (with checkpoint marker noting "auto-save before compaction"), TASK_REGISTRY.md, COMMENTS.md, DECISIONS.md, and FEATURE_LIST.json.
+
 ## CONTEXT OVERFLOW PROTOCOL
 
 If the conversation is getting very long:

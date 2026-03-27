@@ -59,6 +59,7 @@ cp -r "$SCRIPT_DIR/.claude/skills/save" "$TARGET/.claude/skills/"
 echo "  Copying hooks..."
 mkdir -p "$TARGET/.claude/hooks"
 cp "$SCRIPT_DIR/.claude/hooks/pre-commit-check.sh" "$TARGET/.claude/hooks/"
+cp "$SCRIPT_DIR/.claude/hooks/pre-compact-save.sh" "$TARGET/.claude/hooks/"
 # end of 4.2
 
 # 4.3 Copy settings (conditional)

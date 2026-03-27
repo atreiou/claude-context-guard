@@ -75,6 +75,7 @@ From then on, `/start` reads your existing safeguard files and recovers full con
 | `/end` skill | Optional session save point — clean wrap-up with commit and push |
 | `/itemise` skill | Itemisation Protocol — numbered code addressing with backup and integrity verification |
 | Pre-commit hook | Reminds Claude to update safeguard files before every git commit |
+| Pre-compaction hook | Automatically saves all progress before context compression — no data loss |
 
 ## How It Works
 
@@ -160,6 +161,12 @@ add_action('wp_enqueue_scripts', function() {
 **To disable:** set `ITEMISATION: disabled` in your project's `CLAUDE.md`. The `/itemise` command will halt before making any changes. Many developers won't want or need this protocol — the toggle is prominently placed at the top of the Itemisation Protocol section in `CLAUDE.md`.
 
 **Safety:** `/itemise` creates `{filename}.itemise-backup` copies before touching anything, verifies integrity after (strips added comment-numbers and diffs against the backup to confirm no code changed), and restores from backup on any failure.
+
+### Automatic Pre-Compaction Save
+
+When Claude Code is about to compress your conversation (context compaction), a `PreCompact` hook fires automatically. You'll see a notification: **"Context Guard — Auto-saving before compaction."** Claude is then instructed to update all safeguard files before compaction proceeds — capturing everything from the session that would otherwise be lost to compression.
+
+This means you never have to worry about a long session being silently compacted without your progress being saved. Context Guard catches it for you.
 
 ### Pre-Commit Safety
 
