@@ -36,7 +36,7 @@ Check and update ALL of these:
 
 ### TASK_REGISTRY.md
 - Log any new tasks created this session
-- Update status of tasks worked on (done/pending/in-progress)
+- Update status of tasks worked on (✅ done / ⏳ pending / 🔄 in-progress)
 - Ensure NO tasks are missing — cross-reference with what was actually done
 
 ### COMMENTS.md

@@ -5,7 +5,7 @@
 ## CRITICAL: READ THESE FILES FIRST BEFORE ANY WORK
 
 1. **`SESSION_LOG.md`** — What happened in every previous session. READ THIS FIRST.
-2. **`TASK_REGISTRY.md`** — Every task ever created, with status. CHECK before creating new tasks.
+2. **`TASK_REGISTRY.md`** — Every task ever created, with status. CHECK before creating new tasks. Column format: `| ID | Timestamp | Task | Status | Notes |`. IDs use `S{session}-{seq}` format. Status uses emoji: ✅ done, 🔄 in-progress, ⏳ pending, ❌ blocked, 🔁 re-queued.
 3. **`DECISIONS.md`** — Every architectural decision made. NEVER contradict these without explicit approval.
 4. **`FEATURE_LIST.json`** — All features with pass/fail status. The authoritative progress tracker.
 5. **`COMMENTS.md`** — User's verbatim comments from every session. SACRED — never lose these.

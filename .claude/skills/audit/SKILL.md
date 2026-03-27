@@ -19,7 +19,7 @@ Execute ALL checks below and report findings.
 
 ## 2. Task Registry Integrity
 - Read `TASK_REGISTRY.md`
-- Count tasks by status (done/pending/in-progress/blocked/re-queued)
+- Count tasks by status (✅ done / ⏳ pending / 🔄 in-progress / ❌ blocked / 🔁 re-queued)
 - Check for stale in-progress tasks (started but never completed)
 - Cross-reference with `FEATURE_LIST.json` — features without tasks?
 

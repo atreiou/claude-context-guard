@@ -40,7 +40,7 @@ Check and update ALL of these:
 
 ### TASK_REGISTRY.md
 - Log any new tasks created since the last save
-- Update status of tasks worked on (done/pending/in-progress)
+- Update status of tasks worked on (✅ done / ⏳ pending / 🔄 in-progress)
 - Ensure no tasks are missing
 
 ### COMMENTS.md
