@@ -33,6 +33,7 @@ Update safeguard files (SESSION_LOG.md, TASK_REGISTRY.md, COMMENTS.md) IMMEDIATE
 - Every 3-4 user messages (batch update)
 - Before any potentially long operation (testing, uploads, large code generation)
 - When conversation is getting very long (approaching context limits)
+- Or when the user runs `/save` to manually trigger a checkpoint
 
 Do NOT wait for /end. Treat safeguard files as a running log, updated incrementally.
 
@@ -40,12 +41,12 @@ Do NOT wait for /end. Treat safeguard files as a running log, updated incrementa
 
 If the conversation is getting very long:
 1. IMMEDIATELY update all safeguard files with current progress
-2. Tell the user: "Context is getting large. I've saved all progress to safeguard files. If I lose context, run /start to recover."
+2. Tell the user: "Context is getting large. I've saved all progress to safeguard files. You can run /save to force a checkpoint, or if I lose context, run /start to recover."
 3. Continue working but update safeguard files after every significant action
 
 ## SAVE FREQUENCY
 
-After every significant block of work (completing a task, fixing a bug, making a decision, receiving user feedback), append to SESSION_LOG.md and update TASK_REGISTRY.md. The /end command is a CLEAN save — but incremental saves should happen throughout the session. If context is lost mid-session, the safeguard files should contain 90%+ of what happened.
+After every significant block of work (completing a task, fixing a bug, making a decision, receiving user feedback), append to SESSION_LOG.md and update TASK_REGISTRY.md. The /end command is a CLEAN save — but incremental saves should happen throughout the session. The user can also run /save at any time to trigger an explicit mid-session checkpoint. If context is lost mid-session, the safeguard files should contain 90%+ of what happened.
 
 ## Project Overview
 

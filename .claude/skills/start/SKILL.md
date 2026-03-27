@@ -73,6 +73,7 @@ Try to read `CLAUDE.md` in the project root.
 
    ### Next Steps
    - Type /start at the beginning of every session for full context recovery
+   - Type /save during a session to checkpoint progress without ending
    - Type /audit at any time to verify integrity
    - Type /end when you're done for the day (optional clean save point)
 

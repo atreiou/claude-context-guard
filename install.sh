@@ -51,6 +51,7 @@ cp -r "$SCRIPT_DIR/.claude/skills/start" "$TARGET/.claude/skills/"
 cp -r "$SCRIPT_DIR/.claude/skills/end" "$TARGET/.claude/skills/"
 cp -r "$SCRIPT_DIR/.claude/skills/audit" "$TARGET/.claude/skills/"
 cp -r "$SCRIPT_DIR/.claude/skills/itemise" "$TARGET/.claude/skills/"
+cp -r "$SCRIPT_DIR/.claude/skills/save" "$TARGET/.claude/skills/"
 # end of 4.1
 
 # 4.2 Copy hooks

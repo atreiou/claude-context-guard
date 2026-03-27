@@ -14,11 +14,13 @@ This is a known issue. [Anthropic's own engineering team](https://www.anthropic.
 
 ## My Solution
 
-Context Guard creates a set of safeguard files that persist across sessions, plus four slash commands:
+Context Guard creates a set of safeguard files that persist across sessions, plus five slash commands:
 
 - **`/start`** — Type this at the start of every session. Claude reads all safeguard files, cross-references recent plans against the task registry, flags any dropped or unexplained tasks, and summarises the project state. One command, full recovery.
 
 - **`/audit`** — Your personal safeguard. Call this at ANY moment to verify Claude's work. It runs a comprehensive integrity check across all files, plans, and git state.
+
+- **`/save`** — Mid-session checkpoint. Saves all progress to safeguard files without git operations. Use during long sessions or any time you want an explicit save point.
 
 - **`/end`** — Optional session save point. When you're done for the day, type `/end` and Claude will update all safeguard files, commit any uncommitted work, push to remote, and report a clean summary. Not required — `/start` handles recovery regardless — but useful when you want an explicit clean handoff.
 
@@ -69,6 +71,7 @@ From then on, `/start` reads your existing safeguard files and recovers full con
 |-----------|---------|
 | `/start` skill | Session recovery — one command to restore full context |
 | `/audit` skill | On-demand integrity check — verify Claude's work at any moment |
+| `/save` skill | Mid-session checkpoint — update safeguard files without git operations |
 | `/end` skill | Optional session save point — clean wrap-up with commit and push |
 | `/itemise` skill | Itemisation Protocol — numbered code addressing with backup and integrity verification |
 | Pre-commit hook | Reminds Claude to update safeguard files before every git commit |
@@ -104,6 +107,16 @@ When you're ready to stop working, type `/end`. Claude will:
 6. Report a summary of the session and what's pending for next time
 
 This is entirely optional — `/start` will recover context regardless. But `/end` gives you a guaranteed clean save point.
+
+### Mid-Session Checkpoint (`/save`)
+
+A lightweight save point you can run at any time during a session. Claude will:
+1. Check for any unlogged comments, tasks, or decisions
+2. Update all safeguard files with current progress
+3. Add a checkpoint marker to the session log
+4. Confirm what was saved
+
+No git operations, no plan archiving — just a quick save. Use it when a session is running long, before a risky operation, or any time you want peace of mind.
 
 ### Itemisation Protocol (`/itemise`)
 
