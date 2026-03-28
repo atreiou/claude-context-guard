@@ -9,6 +9,8 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 
 The user wants to wrap up this session cleanly. Your job is to create a save point so the next session can pick up seamlessly via `/start`.
 
+**Rule:** Do not narrate or announce that you are following this skill's steps. Just execute them. The user does not need to be told that you are doing your job properly.
+
 ## Step 0: Verify Completeness Before Saving
 
 Before saving, verify nothing has been missed this session:
