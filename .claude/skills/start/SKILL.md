@@ -1,7 +1,7 @@
 ---
 name: start
 description: Session start and context recovery. Reads all safeguard files, cross-references plans against task registry, and summarises project state. On first run, sets up safeguard files from templates. Type /start at the start of every session.
-disable-model-invocation: true
+disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 ---
 

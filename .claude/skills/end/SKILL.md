@@ -1,15 +1,13 @@
 ---
 name: end
 description: Session save point. Updates all safeguard files, commits uncommitted work, and ensures a clean handoff for the next session. Optional — use when you want to cleanly wrap up before stopping.
-disable-model-invocation: true
+disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
 # Context Guard — Session End (/end)
 
 The user wants to wrap up this session cleanly. Your job is to create a save point so the next session can pick up seamlessly via `/start`.
-
-**Rule:** Do not narrate or announce that you are following this skill's steps. Just execute them. The user does not need to be told that you are doing your job properly.
 
 ## Step 0: Verify Completeness Before Saving
 
@@ -75,27 +73,23 @@ Run these checks:
 
 ## Step 6: Report
 
-Present a summary:
+Present the session summary in EXACTLY this format. Do not vary the structure, headings, or field names:
 
 ```
 ## Session [N] — Save Point
 
-### What Was Done
-- [bullet list of completed work]
+**What was done:** [1-2 sentence summary of the session's main accomplishments]
 
-### Tasks Status
-- Done: [count]
-- Pending: [count] — [list them]
-- In Progress: [count] — [list them]
+**Tasks:** [X] done, [Y] pending, [Z] in progress
+- Pending: [list task IDs and names, or "None"]
+- In progress: [list task IDs and names, or "None"]
 
-### Files Modified
-- [list of files changed this session]
+**Commits:** [list of commit hashes, or "None — working tree clean"]
 
-### Git State
-- Last commit: [hash] [message]
-- Pushed to remote: ✅
+**Repos pushed:**
+- [repo name]: [commit hash] ✅ (or ❌ if not pushed, with reason)
 
-### Next Session Pickup
-- [What /start will find when it runs next time]
-- [Any pending work to continue]
+**Next session:** [What /start will find. User's stated intent for next session, or "No pending work."]
 ```
+
+Do not add extra sections. Do not add "Files Modified" unless the session had no commits (uncommitted work needs visibility). Keep it scannable — this is a status report, not a narrative.

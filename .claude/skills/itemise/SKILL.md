@@ -1,7 +1,7 @@
 ---
 name: itemise
 description: Applies the Itemisation Protocol to code files. Numbers sections, functions, and meaningful blocks so every part of the code is referenceable by address. Creates backups before modifying anything, verifies integrity after, deletes backups on success. Type /itemise to run.
-disable-model-invocation: true
+disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 

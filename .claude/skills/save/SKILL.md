@@ -1,7 +1,7 @@
 ---
 name: save
 description: Mid-session checkpoint. Updates all safeguard files with current progress without git operations or plan archiving. A quick save point that protects against context loss during long sessions.
-disable-model-invocation: true
+disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
