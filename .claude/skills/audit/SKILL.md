@@ -46,8 +46,14 @@ Execute ALL checks below and report findings.
 
 ## 7. Unarchived Plans
 - Check `~/.claude/plans/` for any plan files not yet copied to `plans/`
-- **IMPORTANT:** `~/.claude/plans/` is SHARED across all Claude Code projects. Only flag plans that are clearly related to THIS project (e.g. contain the project name in the content or match this project's naming convention). Ignore plans from other projects entirely — do NOT report them.
-- Flag relevant unarchived plans as **NEEDS ARCHIVING**
+- **`~/.claude/plans/` is SHARED across all projects.** To identify which plans belong to this project:
+  - For each `.md` file (excluding `-agent-` files which are sub-agent plans):
+    - Read the first ~500 characters
+    - If the content contains the current project name (from CLAUDE.md), OR contains file paths matching this project's directory structure — it belongs to this project.
+    - If the content references a different project name — skip it.
+    - If ambiguous — skip it. Do not flag plans you can't confidently attribute.
+- Flag matched unarchived plans as **NEEDS ARCHIVING**
+- Ignore plans from other projects entirely — do NOT report them.
 
 ## 8. Safeguard File Existence
 - Verify ALL safeguard files exist at their expected paths and are non-empty:

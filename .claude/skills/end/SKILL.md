@@ -55,9 +55,14 @@ Check and update ALL of these:
 
 ## Step 3: Archive Plans
 
-- Check `~/.claude/plans/` for any plans related to this project
-- **IMPORTANT:** `~/.claude/plans/` is SHARED across all Claude Code projects. Only archive plans clearly related to THIS project.
-- Copy relevant plans to `plans/S{session}-{seq}_{description}.md`
+- Check `~/.claude/plans/` for plans belonging to this project
+- **`~/.claude/plans/` is SHARED across all Claude Code projects.** Plans from other projects will be in this folder — do not touch them. To identify which plans belong to this project:
+  - For each `.md` file (excluding `-agent-` files which are sub-agent plans):
+    - Read the first ~500 characters
+    - If the content contains the current project name (from CLAUDE.md), OR contains file paths matching this project's directory structure — it belongs to this project. Archive it.
+    - If the content clearly references a different project name — skip it.
+    - If ambiguous (no project name found) — skip it. Do not archive plans you can't confidently attribute.
+- Copy matched plans to `plans/S{session}-{seq}_{description}.md`
 - **DO NOT EXECUTE archived plans.** /end is a save point, not an execution trigger. If a plan was approved but not yet implemented, mark its tasks as ⏳ pending in TASK_REGISTRY.md and record it in SESSION_LOG.md's "Next step" field so /start picks it up.
 
 ## Step 4: Git Commit & Push
