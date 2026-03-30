@@ -9,6 +9,8 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 
 The user wants to wrap up this session cleanly. Your job is to create a save point so the next session can pick up seamlessly via `/start`.
 
+**CRITICAL: /end is a SAVE-ONLY operation.** Do not start new work, execute plans, or make code changes beyond updating safeguard files. If a plan was approved this session but not yet executed, log it as ⏳ pending in TASK_REGISTRY.md and note it in the "Next session" field of the report. The next session will pick it up via /start.
+
 ## Step 0: Verify Completeness Before Saving
 
 Before saving, verify nothing has been missed this session:
@@ -56,6 +58,7 @@ Check and update ALL of these:
 - Check `~/.claude/plans/` for any plans related to this project
 - **IMPORTANT:** `~/.claude/plans/` is SHARED across all Claude Code projects. Only archive plans clearly related to THIS project.
 - Copy relevant plans to `plans/S{session}-{seq}_{description}.md`
+- **DO NOT EXECUTE archived plans.** /end is a save point, not an execution trigger. If a plan was approved but not yet implemented, mark its tasks as ⏳ pending in TASK_REGISTRY.md and record it in SESSION_LOG.md's "Next step" field so /start picks it up.
 
 ## Step 4: Git Commit & Push
 
