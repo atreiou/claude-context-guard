@@ -2,7 +2,7 @@
 name: audit
 description: Full project integrity audit. Checks all safeguard files, git state, uncommitted work, plan cross-references, and task registry for completeness. The user's personal safeguard — they can call this at ANY moment to verify your work.
 disable-model-invocation: false
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, Write
 ---
 
 # Context Guard — Project Audit (/audit)
@@ -90,6 +90,13 @@ Execute ALL checks below and report findings.
 
 [...repeat for each issue independently...]
 ```
+
+## 10. Save Report
+
+Save the full audit report (exactly as displayed above) to:
+`audits/YYYY-MM-DD_HHMMSS.md`
+
+Create the `audits/` directory if it doesn't exist. The timestamp uses the current date/time. This creates a persistent audit trail that survives context loss and can be read by external tools.
 
 ### Issue Resolution Rules
 

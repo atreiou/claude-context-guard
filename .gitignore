@@ -11,6 +11,7 @@ DECISIONS.md
 COMMENTS.md
 FEATURE_LIST.json
 plans/
+audits/
 
 # Local settings (user-specific, not part of the open source repo)
 .claude/settings.local.json

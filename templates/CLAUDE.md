@@ -10,6 +10,7 @@
 4. **`FEATURE_LIST.json`** — All features with pass/fail status. The authoritative progress tracker.
 5. **`COMMENTS.md`** — User's verbatim comments from every session. SACRED — never lose these.
 6. **`plans/`** — Archived plans from every session. Read the last 3 in full to cross-reference with TASK_REGISTRY.
+7. **`audits/`** — Saved audit reports with timestamps. Read the latest to check project health.
 
 ## DROPPING TASKS IS ABSOLUTELY UNACCEPTABLE
 
