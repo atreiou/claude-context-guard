@@ -44,6 +44,14 @@ A PreCompact hook automatically backs up all safeguard files before Claude Code 
 
 For best results, also follow the AUTO-CHECKPOINT PROTOCOL above to keep safeguard files current throughout the session.
 
+## RATE LIMIT AWARENESS
+
+Rate limits pause the session but do NOT trigger compaction — context stays intact while waiting. The danger is when a rate limit hits **mid-operation** (e.g. halfway through a multi-file sync or large refactor). When the session resumes, you may lose track of which steps were completed. To protect against this:
+
+1. **Before any multi-step operation** (syncing to multiple repos, batch edits, large refactors), update safeguard files FIRST
+2. **After resuming from a rate limit**, re-read TASK_REGISTRY.md and SESSION_LOG.md to confirm where you left off
+3. **Mark tasks as done individually** as you complete them, not in a batch at the end — a rate limit between step 3 and step 7 of a plan should not lose the record of steps 1-3
+
 ## CONTEXT OVERFLOW PROTOCOL
 
 If the conversation is getting very long:
