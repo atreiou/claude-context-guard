@@ -40,7 +40,9 @@ Do NOT wait for /end. Treat safeguard files as a running log, updated incrementa
 
 ## AUTOMATIC PRE-COMPACTION SAVE
 
-A PreCompact hook is installed that fires BEFORE Claude Code compresses the conversation. When it fires, you will see a notification: "Context Guard — Auto-saving before compaction." When this triggers, you MUST update all safeguard files with current progress BEFORE compaction proceeds. This is your last chance to preserve details that will be lost to compression. Follow the /save steps: update SESSION_LOG.md (with checkpoint marker noting "auto-save before compaction" and an **"In flight"** line capturing exactly what you were working on, the approach, and the next step), TASK_REGISTRY.md, COMMENTS.md, DECISIONS.md, and FEATURE_LIST.json.
+A PreCompact hook automatically backs up all safeguard files before Claude Code compresses the conversation. Copies are saved to `compaction-backups/YYYY-MM-DD_HHMMSS/`. This is a safety net — if context is lost and safeguard files weren't fully up to date, the backup preserves the last known state. The hook runs automatically; no action is needed from you or the user.
+
+For best results, also follow the AUTO-CHECKPOINT PROTOCOL above to keep safeguard files current throughout the session.
 
 ## CONTEXT OVERFLOW PROTOCOL
 

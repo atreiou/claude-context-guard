@@ -12,6 +12,7 @@ COMMENTS.md
 FEATURE_LIST.json
 plans/
 audits/
+compaction-backups/
 
 # Local settings (user-specific, not part of the open source repo)
 .claude/settings.local.json

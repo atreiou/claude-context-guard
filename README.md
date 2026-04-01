@@ -164,9 +164,9 @@ add_action('wp_enqueue_scripts', function() {
 
 ### Automatic Pre-Compaction Save
 
-When Claude Code is about to compress your conversation (context compaction), a `PreCompact` hook fires automatically. You'll see a notification: **"Context Guard — Auto-saving before compaction."** Claude is then instructed to update all safeguard files before compaction proceeds — capturing everything from the session that would otherwise be lost to compression.
+When Claude Code is about to compress your conversation (context compaction), a `PreCompact` hook fires automatically and backs up all safeguard files to a timestamped `compaction-backups/` directory. This is a safety net — if safeguard files weren't fully up to date when compaction hit, the backup preserves the last known state.
 
-This means you never have to worry about a long session being silently compacted without your progress being saved. Context Guard catches it for you.
+Combined with the auto-checkpoint protocol (which keeps safeguard files current throughout the session), this means compaction is a non-event. Your progress is either already saved to the safeguard files, or captured in the backup.
 
 ### Pre-Commit Safety
 
