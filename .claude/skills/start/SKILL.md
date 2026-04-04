@@ -120,6 +120,26 @@ After checking git state, detect potential orphaned work:
 
 If the dates match or the session log is current, continue normally.
 
+## Step 2.7: Commit Orphaned Work
+
+If Step 2 found **uncommitted changes** (modified or untracked files), a previous session likely ended without `/end` (context overflow, rate limit, crash). This work must be committed before proceeding.
+
+1. **Run `git status`** to see all uncommitted and untracked files
+2. **Review the changes** — run `git diff` and `git diff --cached` to understand what was done
+3. **Cross-reference with TASK_REGISTRY.md and SESSION_LOG.md** — identify which session produced these changes and what tasks they relate to
+4. **Stage and commit** with a descriptive message summarising the orphaned work:
+   ```
+   git add [relevant files]
+   git commit -m "Recover uncommitted work from session [N] — [brief summary]"
+   ```
+5. **Push** to remote: `git push`
+6. **Report** what was committed:
+   > ✅ **Orphaned work committed:** [commit hash] — [summary of what was recovered]
+
+If there are **unpushed commits** (committed but not pushed), push them now: `git push && git push --tags`
+
+If the working tree is clean and all commits are pushed, skip this step.
+
 ## Step 3: Cross-Reference Plans
 
 Read the **last 3 plan files** from the `plans/` directory IN FULL.

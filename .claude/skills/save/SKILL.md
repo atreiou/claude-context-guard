@@ -57,7 +57,23 @@ Check and update ALL of these:
 ### FEATURE_LIST.json
 - If any features changed status (passes: false → true), update them
 
-## Step 3: Confirm
+## Step 3: Git Commit & Push
+
+After updating safeguard files, commit everything to git so the save point is durable:
+
+1. **Stage all changes** — safeguard files AND any code changes since the last commit:
+   ```
+   git add [all modified and new files]
+   ```
+2. **Commit** with a descriptive message:
+   ```
+   git commit -m "Checkpoint: [brief summary of work since last commit]"
+   ```
+3. **Push** to remote: `git push`
+
+If there are no changes to commit (everything is already committed), skip this step.
+
+## Step 4: Confirm
 
 Present a brief confirmation — keep it concise, not a full report:
 
@@ -69,12 +85,12 @@ Present a brief confirmation — keep it concise, not a full report:
 - COMMENTS.md — [N comments added / no changes needed]
 - DECISIONS.md — [N decisions added / no changes needed]
 - FEATURE_LIST.json — [N features updated / no changes needed]
+- Git — [commit hash] pushed / no changes to commit
 
 Progress is saved. Continue working — run /save again any time, or /end to wrap up.
 ```
 
 Do NOT perform any of the following (these are /end responsibilities):
-- Git commit, push, or tagging
 - Plan archiving
 - Git state verification
 - Full session summary report
