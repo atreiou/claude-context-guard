@@ -1,8 +1,8 @@
 ---
 name: audit
 description: Full project integrity audit. Checks all safeguard files, git state, uncommitted work, plan cross-references, and task registry for completeness. The user's personal safeguard — they can call this at ANY moment to verify your work.
-disable-model-invocation: true
-allowed-tools: Read, Grep, Glob, Bash
+disable-model-invocation: false
+allowed-tools: Read, Grep, Glob, Bash, Write
 ---
 
 # Context Guard — Project Audit (/audit)
@@ -19,7 +19,7 @@ Execute ALL checks below and report findings.
 
 ## 2. Task Registry Integrity
 - Read `TASK_REGISTRY.md`
-- Count tasks by status (done/pending/in-progress/blocked/re-queued)
+- Count tasks by status (✅ done / ⏳ pending / 🔄 in-progress / ❌ blocked / 🔁 re-queued)
 - Check for stale in-progress tasks (started but never completed)
 - Cross-reference with `FEATURE_LIST.json` — features without tasks?
 
@@ -46,8 +46,14 @@ Execute ALL checks below and report findings.
 
 ## 7. Unarchived Plans
 - Check `~/.claude/plans/` for any plan files not yet copied to `plans/`
-- **IMPORTANT:** `~/.claude/plans/` is SHARED across all Claude Code projects. Only flag plans that are clearly related to THIS project (e.g. contain the project name in the content or match this project's naming convention). Ignore plans from other projects entirely — do NOT report them.
-- Flag relevant unarchived plans as **NEEDS ARCHIVING**
+- **`~/.claude/plans/` is SHARED across all projects.** To identify which plans belong to this project:
+  - For each `.md` file (excluding `-agent-` files which are sub-agent plans):
+    - Read the first ~500 characters
+    - If the content contains the current project name (from CLAUDE.md), OR contains file paths matching this project's directory structure — it belongs to this project.
+    - If the content references a different project name — skip it.
+    - If ambiguous — skip it. Do not flag plans you can't confidently attribute.
+- Flag matched unarchived plans as **NEEDS ARCHIVING**
+- Ignore plans from other projects entirely — do NOT report them.
 
 ## 8. Safeguard File Existence
 - Verify ALL safeguard files exist at their expected paths and are non-empty:
@@ -84,6 +90,13 @@ Execute ALL checks below and report findings.
 
 [...repeat for each issue independently...]
 ```
+
+## 10. Save Report
+
+Save the full audit report (exactly as displayed above) to:
+`audits/YYYY-MM-DD_HHMMSS.md`
+
+Create the `audits/` directory if it doesn't exist. The timestamp uses the current date/time. This creates a persistent audit trail that survives context loss and can be read by external tools.
 
 ### Issue Resolution Rules
 

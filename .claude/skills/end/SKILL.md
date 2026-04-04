@@ -1,13 +1,24 @@
 ---
 name: end
 description: Session save point. Updates all safeguard files, commits uncommitted work, and ensures a clean handoff for the next session. Optional — use when you want to cleanly wrap up before stopping.
-disable-model-invocation: true
+disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
 # Context Guard — Session End (/end)
 
 The user wants to wrap up this session cleanly. Your job is to create a save point so the next session can pick up seamlessly via `/start`.
+
+**CRITICAL: /end is a SAVE-ONLY operation.** Do not start new work, execute plans, or make code changes beyond updating safeguard files. If a plan was approved this session but not yet executed, log it as ⏳ pending in TASK_REGISTRY.md and note it in the "Next session" field of the report. The next session will pick it up via /start.
+
+## Step 0: Verify Completeness Before Saving
+
+Before saving, verify nothing has been missed this session:
+- Are there any user comments from this session NOT yet in COMMENTS.md?
+- Are there any tasks worked on NOT yet updated in TASK_REGISTRY.md?
+- Review the conversation for any decisions made but not logged in DECISIONS.md
+
+If anything is missing, log it BEFORE proceeding to Step 1.
 
 ## Step 1: Gather Session Context
 
@@ -24,10 +35,12 @@ Check and update ALL of these:
 ### SESSION_LOG.md
 - Add an entry for this session (or update the existing one)
 - Include: what happened, commits made, tasks completed, tasks remaining
+- **Next step:** Capture what the user wants done next, using their own words where possible. Not just a list of pending tasks — the actual direction, priority, and intent. This is what the next session's /start will read to understand where to pick up.
+- **Errors encountered:** If any significant errors, blockers, or unexpected issues were hit during the session, log what happened and how it was resolved. Skip this if nothing notable occurred — don't force empty sections. This prevents future sessions from repeating the same mistakes.
 
 ### TASK_REGISTRY.md
 - Log any new tasks created this session
-- Update status of tasks worked on (done/pending/in-progress)
+- Update status of tasks worked on (✅ done / ⏳ pending / 🔄 in-progress)
 - Ensure NO tasks are missing — cross-reference with what was actually done
 
 ### COMMENTS.md
@@ -42,9 +55,15 @@ Check and update ALL of these:
 
 ## Step 3: Archive Plans
 
-- Check `~/.claude/plans/` for any plans related to this project
-- **IMPORTANT:** `~/.claude/plans/` is SHARED across all Claude Code projects. Only archive plans clearly related to THIS project.
-- Copy relevant plans to `plans/S{session}-{seq}_{description}.md`
+- Check `~/.claude/plans/` for plans belonging to this project
+- **`~/.claude/plans/` is SHARED across all Claude Code projects.** Plans from other projects will be in this folder — do not touch them. To identify which plans belong to this project:
+  - For each `.md` file (excluding `-agent-` files which are sub-agent plans):
+    - Read the first ~500 characters
+    - If the content contains the current project name (from CLAUDE.md), OR contains file paths matching this project's directory structure — it belongs to this project. Archive it.
+    - If the content clearly references a different project name — skip it.
+    - If ambiguous (no project name found) — skip it. Do not archive plans you can't confidently attribute.
+- Copy matched plans to `plans/S{session}-{seq}_{description}.md`
+- **DO NOT EXECUTE archived plans.** /end is a save point, not an execution trigger. If a plan was approved but not yet implemented, mark its tasks as ⏳ pending in TASK_REGISTRY.md and record it in SESSION_LOG.md's "Next step" field so /start picks it up.
 
 ## Step 4: Git Commit & Push
 
@@ -62,27 +81,23 @@ Run these checks:
 
 ## Step 6: Report
 
-Present a summary:
+Present the session summary in EXACTLY this format. Do not vary the structure, headings, or field names:
 
 ```
 ## Session [N] — Save Point
 
-### What Was Done
-- [bullet list of completed work]
+**What was done:** [1-2 sentence summary of the session's main accomplishments]
 
-### Tasks Status
-- Done: [count]
-- Pending: [count] — [list them]
-- In Progress: [count] — [list them]
+**Tasks:** [X] done, [Y] pending, [Z] in progress
+- Pending: [list task IDs and names, or "None"]
+- In progress: [list task IDs and names, or "None"]
 
-### Files Modified
-- [list of files changed this session]
+**Commits:** [list of commit hashes, or "None — working tree clean"]
 
-### Git State
-- Last commit: [hash] [message]
-- Pushed to remote: ✅
+**Repos pushed:**
+- [repo name]: [commit hash] ✅ (or ❌ if not pushed, with reason)
 
-### Next Session Pickup
-- [What /start will find when it runs next time]
-- [Any pending work to continue]
+**Next session:** [What /start will find. User's stated intent for next session, or "No pending work."]
 ```
+
+Do not add extra sections. Do not add "Files Modified" unless the session had no commits (uncommitted work needs visibility). Keep it scannable — this is a status report, not a narrative.
