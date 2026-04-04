@@ -26,7 +26,6 @@ echo ""
 
 # 3. SECTION: Pre-flight checks
 # 3.1 Check if .claude/ already exists
-# Check if .claude/ already exists
 if [ -d "$TARGET/.claude" ]; then
     echo "  WARNING: $TARGET/.claude/ already exists."
     echo "  Context Guard files will be merged into your existing .claude/ folder."
@@ -40,6 +39,54 @@ if [ -d "$TARGET/.claude" ]; then
     echo ""
 fi
 # end of 3.1
+
+# 3.2 Detect parent directory with .claude/ (working directory mismatch)
+# Claude Code looks for skills in its working directory's .claude/skills/.
+# If the user opens Claude Code in a parent folder (e.g. /Software/) but
+# installs CCG into a subfolder (e.g. /Software/MyProject/), the skills
+# won't be found. Detect this and offer to install skills at the parent level.
+PARENT_CLAUDE_DIR=""
+CHECK_DIR="$(dirname "$TARGET")"
+while [ "$CHECK_DIR" != "/" ] && [ "$CHECK_DIR" != "." ]; do
+    if [ -d "$CHECK_DIR/.claude" ]; then
+        PARENT_CLAUDE_DIR="$CHECK_DIR"
+        break
+    fi
+    CHECK_DIR="$(dirname "$CHECK_DIR")"
+done
+
+if [ -n "$PARENT_CLAUDE_DIR" ]; then
+    echo "  NOTICE: Found .claude/ in a parent directory:"
+    echo "    $PARENT_CLAUDE_DIR/.claude/"
+    echo ""
+    echo "  If you open Claude Code from that parent directory, it will look"
+    echo "  for skills there — not in $TARGET/.claude/skills/."
+    echo "  CCG skills and hooks need to exist at the working directory level"
+    echo "  to be discovered by Claude Code."
+    echo ""
+    echo "  Options:"
+    echo "    1) Install skills and hooks to BOTH locations (recommended)"
+    echo "    2) Install to target directory only (skip parent)"
+    echo "    3) Abort"
+    echo ""
+    read -p "  Choose (1/2/3): " -n 1 -r
+    echo ""
+    echo ""
+
+    case "$REPLY" in
+        1)
+            INSTALL_TO_PARENT=true
+            ;;
+        2)
+            INSTALL_TO_PARENT=false
+            ;;
+        *)
+            echo "  Aborted."
+            exit 1
+            ;;
+    esac
+fi
+# end of 3.2
 # end of 3
 
 # 4. SECTION: File installation
@@ -78,6 +125,30 @@ echo "  Copying templates..."
 mkdir -p "$TARGET/templates"
 cp "$SCRIPT_DIR/templates/"* "$TARGET/templates/"
 # end of 4.4
+
+# 4.5 Copy skills and hooks to parent directory (if selected)
+if [ "${INSTALL_TO_PARENT:-false}" = true ] && [ -n "$PARENT_CLAUDE_DIR" ]; then
+    echo "  Copying skills to parent: $PARENT_CLAUDE_DIR/.claude/skills/"
+    mkdir -p "$PARENT_CLAUDE_DIR/.claude/skills"
+    cp -r "$SCRIPT_DIR/.claude/skills/start" "$PARENT_CLAUDE_DIR/.claude/skills/"
+    cp -r "$SCRIPT_DIR/.claude/skills/end" "$PARENT_CLAUDE_DIR/.claude/skills/"
+    cp -r "$SCRIPT_DIR/.claude/skills/audit" "$PARENT_CLAUDE_DIR/.claude/skills/"
+    cp -r "$SCRIPT_DIR/.claude/skills/itemise" "$PARENT_CLAUDE_DIR/.claude/skills/"
+    cp -r "$SCRIPT_DIR/.claude/skills/save" "$PARENT_CLAUDE_DIR/.claude/skills/"
+
+    echo "  Copying hooks to parent: $PARENT_CLAUDE_DIR/.claude/hooks/"
+    mkdir -p "$PARENT_CLAUDE_DIR/.claude/hooks"
+    cp "$SCRIPT_DIR/.claude/hooks/pre-commit-check.sh" "$PARENT_CLAUDE_DIR/.claude/hooks/"
+    cp "$SCRIPT_DIR/.claude/hooks/pre-compact-save.sh" "$PARENT_CLAUDE_DIR/.claude/hooks/"
+
+    if [ ! -f "$PARENT_CLAUDE_DIR/.claude/settings.json" ]; then
+        echo "  Copying settings.json to parent..."
+        cp "$SCRIPT_DIR/.claude/settings.json" "$PARENT_CLAUDE_DIR/.claude/settings.json"
+    else
+        echo "  Skipping parent settings.json (already exists)"
+    fi
+fi
+# end of 4.5
 # end of 4
 
 # 5. SECTION: Success output
