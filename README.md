@@ -10,7 +10,7 @@ Claude Code sessions get cut off by rate limits, context compaction, and crashes
 
 This is a known issue. [Anthropic's own engineering team](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) documented the same failure modes and recommended external state files as the solution.
 
-> **Note:** Context Guard is NOT the same as Claude Code's built-in "context compaction." Compaction is Claude Code's automatic process that compresses your conversation when it gets too long — it happens whether or not you have Context Guard installed. What Context Guard does is ensure that when compaction happens (or when you start a fresh session), nothing important gets lost. The `/start` command reads your safeguard files and rebuilds full context from them, so compaction becomes a non-event instead of a disaster.
+> **Note:** Context Guard is NOT the same as Claude Code's built-in "context compaction." Compaction is Claude Code's automatic process that compresses your conversation when it gets too long — it happens whether or not you have Context Guard installed. What Context Guard does is ensure that when compaction happens (or when you start a fresh session), nothing important gets lost. The `/start` command reads your safeguard files and rebuilds full context from them, so compaction becomes a non-event instead of a disaster. There should now be an option to stop their auto-compaction as it just happends randomly and is annoyingand no longer needed. To be fair though, all the LLMs should now just have thie Context Guard or similar, built in. I'm actually quite surprised that they still haven't figured this out and rely on compaction. I guess that's what happens when you let an Operational Analyst near AI, not a coder. ;p
 
 ## My Solution
 
@@ -75,7 +75,6 @@ From then on, `/start` reads your existing safeguard files and recovers full con
 | `/end` skill | Optional session save point — clean wrap-up with commit and push |
 | `/itemise` skill | Itemisation Protocol — numbered code addressing with backup and integrity verification |
 | Pre-commit hook | Reminds Claude to update safeguard files before every git commit |
-| Pre-compaction hook | Automatically saves all progress before context compression — no data loss |
 
 ## How It Works
 
@@ -162,12 +161,6 @@ add_action('wp_enqueue_scripts', function() {
 
 **Safety:** `/itemise` creates `{filename}.itemise-backup` copies before touching anything, verifies integrity after (strips added comment-numbers and diffs against the backup to confirm no code changed), and restores from backup on any failure.
 
-### Automatic Pre-Compaction Save
-
-When Claude Code is about to compress your conversation (context compaction), a `PreCompact` hook fires automatically and backs up all safeguard files to a timestamped `compaction-backups/` directory. This is a safety net — if safeguard files weren't fully up to date when compaction hit, the backup preserves the last known state.
-
-Combined with the auto-checkpoint protocol (which keeps safeguard files current throughout the session), this means compaction is a non-event. Your progress is either already saved to the safeguard files, or captured in the backup.
-
 ### Pre-Commit Safety
 
 Before every git commit, a hook reminds Claude to update:
@@ -189,7 +182,7 @@ Examples: `S5-001_install-deps`, `S5-002_add-auth`, `S6-001_fix-login-bug`
 
 ## Design Principles
 
-Context Guard was born from three years of practical experience fighting context rot across LLM-assisted projects. The approach — external state files, cross-referencing, and audit trails — was developed empirically before being validated by [Anthropic's own research on long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) and the [Recursive Language Models paper](https://arxiv.org/abs/2512.24601) (MIT CSAIL). The core principles:
+I have been building (in practice,) this and another protocol which I am not sharing, for now, for quite some time. I am not a software engineer, just an avid AI user, but with Operational Analysis skills, I have over the last 3 years built what I consider the best context-rot defense out there, without even knowing why it works. I just had to figure out how to stop the problems all the LLMs kept making, without understanding why they are making them. Of course I have learneed all of that over the last year in particular now and it turns out I was right, and have been validated by the following, and genuinely hope the results of my 3 years of funmbling in the dark - that probably should be written into these models as standard - helps others like it now helps me: [Anthropic's research](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) and the [Recursive Language Models paper](https://arxiv.org/abs/2512.24601) (MIT CSAIL):
 
 1. **External state over in-context memory** — files survive, context windows don't
 2. **JSON for structured data** — LLMs are less likely to accidentally overwrite JSON than markdown
