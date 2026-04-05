@@ -68,3 +68,18 @@
 **Decision:** The D-007 sync workflow now covers: AutoPoster, Audit for AI, Dev Base, Waypoint AR, Lilu (runtime), Lilu/claude-context-guard (build-time, shares public remote), Socials.club (parent level, covers seeko-child), Socials.club/Claude Context Guard (shares public remote), /Software/ parent level. Lilu/CCG and Socials.club/CCG share the public remote — only pull from upstream, never commit divergent content.
 **Rationale:** Two new projects added (seeko-child via Socials.club, Waypoint AR). A stale Lilu/CCG copy caused a merge that overwrote 4 public repo files during this session — shared-remote repos must be treated with care.
 **Source:** Session 10, user directive + merge incident.
+
+## D-014: Safeguard file pagination at 300 lines (2026-04-05)
+**Decision:** When safeguard files exceed 300 lines, /save and /end archive older content into numbered page files (_page1.md, _page2.md, etc.). SESSION_LOG and TASK_REGISTRY keep last 3 sessions. DECISIONS archives only actioned/implemented decisions. COMMENTS archives actioned comments and curiosity questions. FEATURE_LIST.json is exempt (stays compact). Pagination runs during /save and /end (agent has full context), NOT during /start (agent has no context).
+**Rationale:** Real-world file sizes already causing context bloat — Dev Base SESSION_LOG at 377 lines, Waypoint AR TASK_REGISTRY at 603 lines. User correctly identified /save and /end as the right time because the agent has full session context to make smart archival decisions.
+**Source:** Session 11, user directive.
+
+## D-015: Archives are NOT auto-read by /start (2026-04-05)
+**Decision:** /start notes archive page existence but does NOT read them. Archives are only consulted: (1) when the user explicitly asks, (2) when something genuinely seems missing, or (3) by /audit during cross-referencing. The whole point of pagination is keeping archives OUT of context.
+**Rationale:** User flagged that auto-reading archives defeats the purpose of pagination. If /save and /end do their jobs properly, only genuinely unneeded content goes to archives.
+**Source:** Session 11, user directive.
+
+## D-016: /end pushes dev branch to backup remote (2026-04-05)
+**Decision:** /end checks for a `backup` remote. If one exists, it runs `git checkout dev && git merge main --no-edit && git push backup dev && git checkout main` after the main push. This keeps the private backup in sync automatically.
+**Rationale:** The private CCG backup repo (claude-context-guard-dev) was going stale because no skill pushed to it.
+**Source:** Session 11, Devil's Advocate assessment.

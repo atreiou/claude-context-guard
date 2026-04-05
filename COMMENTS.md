@@ -101,3 +101,25 @@
 > [2026-04-04] "Ok cool - so if the public repo of CCG has now been restored, does that effect the Journey Kit from earlier?" — Rob checking if stale merge affected the kit bundle. **Actioned:** Rebuilt kit_bundle.json with updated skills.
 
 > [2026-04-04] "You don't need to make a plan for this, it's simple, just do it please" / "You're out of plan mode, please just complete my previous request" — Rob wanting direct execution for simple tasks. **Actioned:** Skipped plan mode, executed directly.
+
+## Session 11 — 2026-04-05
+
+> [2026-04-05] "Session log and task registry can just keep the last 3, no need for 5, but make sure to include the ability to actually go reference the older files in case there is confusion or something seems to be missing." — Rob on pagination design. **Actioned:** D-014, changed from 5 to 3 sessions.
+
+> [2026-04-05] "Decisions and comments - if they are something that has been done and actioned, they can be moved to an archive that doesn't get read unless specifically instructed or is part of a debugging cross reference - don't delete anything just move it off the list to be read automatically." — Rob on DECISIONS/COMMENTS archival strategy. **Actioned:** D-014.
+
+> [2026-04-05] "I don't see how the start skill is the right place to do this - it should be on save or end as that is when the agent definitely has full context and can make the best decisions." — Rob on when pagination should run. **Actioned:** D-014, moved from /start to /save and /end.
+
+> [2026-04-05] "In comments - archive any questions that are just curiosities, not necessarily comments about the project itself." — Rob on COMMENTS archival. **Actioned:** D-014, curiosity questions added to archive criteria.
+
+> [2026-04-05] "/start reads only current files, notes archive existence, and checks archives before flagging DROPPED tasks - then what is the point in having them archived if the start skill is going to read the archives anyway!? No - it should not do that, it should only check archives if explicitly asked to, or if there is confusion or it feels something is missing." — Rob on /start not auto-reading archives. **Actioned:** D-015, fixed /start to not auto-read.
+
+> [2026-04-05] "I think reviewing archives and cross-referencing should be left for the audit skill." — Rob on where archive cross-referencing belongs. **Actioned:** D-015.
+
+> [2026-04-05] "Also, is the readme for the repos - especially the open source public one, being kept up-to-date with all of these improvements? But obviously not as 'improvements' but as 'features.'" — Rob on README maintenance. **Actioned:** S11-005, README updated with all features.
+
+> [2026-04-05] "You shouldn't be having to ask me to give you permission to edit files!? That's a really simple and necessary task and you are set to 'bypass permissions' - please check your config and make sure it is actually set to bypass permissions, this is fucking annoying having to give you permission to do the same thing over and over." — Rob on permission prompts. **Noted:** Config verified correct (defaultMode: bypassPermissions, skipDangerousModePermissionPrompt: true). The prompts are from Claude Code's platform-level safety layer, not the config.
+
+> [2026-04-05] "Obviously don't bother updating anything until after you've added the new page feature to help keep context bloat down due to extended records." — Rob on prioritising pagination before syncing. **Actioned:** Pagination implemented first, then all syncs.
+
+> [2026-04-05] "Ok great, now update the Journey.AI kit ready for upload later this evening please." — Rob requesting kit bundle rebuild. **Actioned:** S11-008.

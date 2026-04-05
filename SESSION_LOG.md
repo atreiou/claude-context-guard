@@ -168,3 +168,23 @@
 **Errors encountered:** Lilu/claude-context-guard shares the public remote (atreiou/claude-context-guard). An automated sync agent committed and merged there, pulling in stale file versions that overwrote rate limit awareness, slash command enforcement, parent-dir detection, and more. Fixed by restoring from the correct commit. Memory updated with warning about shared-remote repos.
 **Decisions made:** D-011 (/start and /save must commit/push), D-012 (kit files local-only), D-013 (expanded consumer instance list)
 **Next step:** JourneyKits publish scheduled for 2026-04-05 18:45 UTC. CCG is otherwise stable. No pending work.
+
+---
+
+## Session 11 — 2026-04-05 (Safeguard File Pagination + Repo Cleanup)
+
+**What happened:**
+- Implemented safeguard file pagination: /save and /end now archive older content into numbered page files (_page1.md, _page2.md) when files exceed 300 lines. SESSION_LOG and TASK_REGISTRY keep last 3 sessions; DECISIONS archives actioned decisions; COMMENTS archives actioned comments and curiosity questions.
+- Fixed /start archive behaviour: archives are noted but NOT auto-read. Only read on explicit request or genuine confusion. Cross-referencing archives is /audit's job.
+- Added backup remote push to /end: auto-pushes dev branch to `backup` remote if one exists.
+- Updated README.md with all features documented as shipped capabilities: pagination, root discovery, orphaned work recovery, /save commit/push, backup remote sync.
+- Synced all changes to all 10 locations (7 consumer repos + Lilu runtime + 2 parent folders). Every repo committed and pushed.
+- Rebuilt kit_bundle.json with all current features for JourneyKits upload. Created rebuild_bundle.py for future rebuilds (excluded via .git/info/exclude).
+- Confirmed Lilu templates location is correct at core/governance/context-guard/templates/.
+- Provided Devil's Advocate assessment identifying 5 issues from previous session's repo overhaul.
+
+**Commits:** `611dd3b` (pagination), `d005543` (backup remote push), `f40671d` (README + /start archive fix)
+**Consumer syncs:** AutoPoster, Audit for AI, Dev Base, Lilu, Waypoint AR, My number picker, seeko-child — all committed and pushed (3 rounds of sync)
+**Tasks completed:** 9 (S11-001 through S11-009)
+**Decisions made:** D-014 (safeguard file pagination), D-015 (archives not auto-read), D-016 (/end pushes to backup remote)
+**Next step:** Upload kit_bundle.json to JourneyKits.ai (scheduled or manual). Waypoint AR template artifacts still need cleanup (deferred). Parent folder CCG skills can drift — no automated tracking mechanism yet.
