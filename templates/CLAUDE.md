@@ -12,6 +12,10 @@
 6. **`plans/`** — Archived plans from every session. Read the last 3 in full to cross-reference with TASK_REGISTRY.
 7. **`audits/`** — Saved audit reports with timestamps. Read the latest to check project health.
 
+## SAFEGUARD FILE PAGINATION
+
+Safeguard files are automatically paginated to prevent context bloat. When a file exceeds 300 lines, `/save` and `/end` archive older content into numbered page files (e.g. `SESSION_LOG_page1.md`, `TASK_REGISTRY_page2.md`). The main file always contains the most recent/active content. Archive pages are NOT auto-read by `/start` — they exist for reference when historical context is needed or when cross-referencing reveals gaps. Never delete archive pages.
+
 ## DROPPING TASKS IS ABSOLUTELY UNACCEPTABLE
 
 Dropping tasks will result in the **complete failure of this project**. Every task you create MUST be logged in `TASK_REGISTRY.md` with a timestamp. If a task cannot be completed in this session, it MUST remain in the registry as `pending`. If a background agent fails (rate limit, timeout, etc.), the tasks it was supposed to do MUST be re-logged as `pending` in the registry.
