@@ -113,9 +113,9 @@ Read ALL of these files in order:
 6. `FEATURE_LIST.json` — feature pass/fail status
 
 **Archive awareness:** After reading each file, check for `_page*.md` archives (e.g. `SESSION_LOG_page1.md`, `TASK_REGISTRY_page1.md`). If archives exist:
-- Do NOT read them by default — they contain older history that was rotated out to save context
-- Note them in your Step 5 summary: "📁 N archive pages available for [file] — read if historical context needed"
-- Only read archives if cross-referencing in Step 3 reveals gaps (e.g. a plan references a task not found in the current TASK_REGISTRY)
+- Do NOT read them — they contain older history that was rotated out to save context
+- Note them in your Step 5 summary: "📁 N archive pages available for [file]"
+- Only read archives if the user explicitly asks you to, or if you genuinely feel something is missing and cannot make sense of the current files without historical context
 
 ## Step 2: Check Git State
 
@@ -165,8 +165,8 @@ Read the **last 3 plan files** from the `plans/` directory IN FULL.
 
 For each plan:
 - Check every task/step mentioned against TASK_REGISTRY.md
-- If a task appears in a plan but NOT in the current registry, **check archive pages** (`TASK_REGISTRY_page*.md`) before flagging — it may have been completed and archived
-- Flag any task that appears in a plan but is NOT in the registry OR any archive (DROPPED TASK — critical)
+- Flag any task that appears in a plan but NOT in the registry (DROPPED TASK — critical)
+- Note: completed tasks may have been archived to `TASK_REGISTRY_page*.md` by pagination. If flagged tasks seem like they were likely completed in older sessions, mention this possibility rather than treating it as critical. Full archive cross-referencing is the `/audit` skill's job.
 - Flag any task in the registry with no corresponding plan, decision, or user comment (UNEXPLAINED TASK)
 
 ## Step 4: Determine Session Number
