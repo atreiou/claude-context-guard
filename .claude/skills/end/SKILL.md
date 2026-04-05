@@ -133,6 +133,11 @@ For each file over 300 lines, apply the appropriate rotation:
 - Stage and commit all changes with a descriptive message
 - Tag with the project's commit tagging convention
 - Push to remote (including tags)
+- **Backup remote:** If a `backup` remote exists (`git remote | grep backup`), also push to it:
+  ```
+  git checkout dev && git merge main --no-edit && git push backup dev && git checkout main
+  ```
+  This keeps the private backup in sync. If no `backup` remote exists, skip this.
 
 ## Step 5: Verify Clean State
 
