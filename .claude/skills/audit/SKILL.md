@@ -11,6 +11,20 @@ allowed-tools: Read, Grep, Glob, Bash, Write
 
 Execute ALL checks below and report findings.
 
+## 0. Locate CCG Root
+
+Safeguard files may not be in the current working directory — they could be in a subdirectory. Find them first.
+
+1. **Check the working directory:** Try to read `CLAUDE.md` in the current directory.
+2. **If not found, search subdirectories:**
+   ```bash
+   find . -maxdepth 4 -name "CLAUDE.md" -type f 2>/dev/null | head -10
+   ```
+3. **Filter:** For each result, check it contains `TASK_REGISTRY.md` (confirms it's a Context Guard CLAUDE.md) and does NOT contain `{PROJECT_NAME}` (uninitialized template).
+4. **Set CCG_ROOT:** Use the directory of the valid CLAUDE.md found. If multiple, ask the user. If none, warn: "No Context Guard files found. Run /start first."
+
+**All file paths in subsequent steps are relative to CCG_ROOT.** Git operations should also run from CCG_ROOT if it differs from the working directory.
+
 ## 1. Git State
 - Run `git status` — any uncommitted or untracked files?
 - Run `git log --oneline -5` — recent commits with tags

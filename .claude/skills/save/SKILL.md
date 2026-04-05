@@ -7,9 +7,23 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 
 # Context Guard — Mid-Session Checkpoint (/save)
 
-The user wants to save current progress without ending the session. This is a lightweight checkpoint — no git operations, no plan archiving, no session wrap-up. Just update the safeguard files and confirm.
+The user wants to save current progress without ending the session. This is a lightweight checkpoint — no plan archiving, no session wrap-up. Update safeguard files, commit, push, and confirm.
 
-## Step 0: Verify Completeness
+## Step 0: Locate CCG Root
+
+Safeguard files may not be in the current working directory — they could be in a subdirectory. Find them first.
+
+1. **Check the working directory:** Try to read `CLAUDE.md` in the current directory.
+2. **If not found, search subdirectories:**
+   ```bash
+   find . -maxdepth 4 -name "CLAUDE.md" -type f 2>/dev/null | head -10
+   ```
+3. **Filter:** For each result, check it contains `TASK_REGISTRY.md` (confirms it's a Context Guard CLAUDE.md) and does NOT contain `{PROJECT_NAME}` (uninitialized template).
+4. **Set CCG_ROOT:** Use the directory of the valid CLAUDE.md found. If multiple, ask the user. If none, warn: "No Context Guard files found. Run /start first."
+
+**All safeguard file paths in subsequent steps are relative to CCG_ROOT.** Git operations should also run from CCG_ROOT if it differs from the working directory.
+
+## Step 0.5: Verify Completeness
 
 Before saving, check what might be missing:
 - Are there any user comments from this session NOT yet in COMMENTS.md?

@@ -11,7 +11,7 @@ Applies hierarchical section numbering to code files so every block is reference
 
 ## Step 0: Check the Toggle
 
-Read `CLAUDE.md` in the current project root. Look for a line that starts with `ITEMISATION:`.
+Locate `CLAUDE.md` — check the current directory first, then search subdirectories (`find . -maxdepth 4 -name "CLAUDE.md" -type f`) if not found. Use the one that contains `TASK_REGISTRY.md` (confirms it's a Context Guard CLAUDE.md). Look for a line that starts with `ITEMISATION:`.
 
 - If it says `ITEMISATION: disabled` — stop here. Inform the user: "Itemisation Protocol is disabled. Change `ITEMISATION: disabled` to `ITEMISATION: enabled` in CLAUDE.md to activate it."
 - If it says `ITEMISATION: enabled` or the setting is absent — proceed.

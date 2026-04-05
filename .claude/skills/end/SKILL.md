@@ -11,7 +11,21 @@ The user wants to wrap up this session cleanly. Your job is to create a save poi
 
 **CRITICAL: /end is a SAVE-ONLY operation.** Do not start new work, execute plans, or make code changes beyond updating safeguard files. If a plan was approved this session but not yet executed, log it as ⏳ pending in TASK_REGISTRY.md and note it in the "Next session" field of the report. The next session will pick it up via /start.
 
-## Step 0: Verify Completeness Before Saving
+## Step 0: Locate CCG Root
+
+Safeguard files may not be in the current working directory — they could be in a subdirectory. Find them first.
+
+1. **Check the working directory:** Try to read `CLAUDE.md` in the current directory.
+2. **If not found, search subdirectories:**
+   ```bash
+   find . -maxdepth 4 -name "CLAUDE.md" -type f 2>/dev/null | head -10
+   ```
+3. **Filter:** For each result, check it contains `TASK_REGISTRY.md` (confirms it's a Context Guard CLAUDE.md) and does NOT contain `{PROJECT_NAME}` (uninitialized template).
+4. **Set CCG_ROOT:** Use the directory of the valid CLAUDE.md found. If multiple, ask the user. If none, warn: "No Context Guard files found. Run /start first."
+
+**All safeguard file paths in subsequent steps are relative to CCG_ROOT.** Git operations should also run from CCG_ROOT if it differs from the working directory.
+
+## Step 0.5: Verify Completeness Before Saving
 
 Before saving, verify nothing has been missed this session:
 - Are there any user comments from this session NOT yet in COMMENTS.md?

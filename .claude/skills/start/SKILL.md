@@ -9,20 +9,34 @@ allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 
 You are starting or resuming a session. Follow these steps EXACTLY:
 
-## Step 0: First-Run Detection
+## Step 0: Locate CCG Root
 
-Before reading safeguard files, check whether they exist yet.
+Context Guard safeguard files may not be in the current working directory — they could be in a subdirectory (e.g. the working directory is a parent folder that contains the actual project). Find them before doing anything else.
 
-Try to read `CLAUDE.md` in the project root.
+1. **Check the working directory first:** Try to read `CLAUDE.md` in the current directory.
+2. **If not found, search subdirectories:**
+   ```bash
+   find . -maxdepth 4 -name "CLAUDE.md" -type f 2>/dev/null | head -10
+   ```
+3. **Filter results:** For each CLAUDE.md found, check if it contains `TASK_REGISTRY.md` (which confirms it's a Context Guard CLAUDE.md, not an unrelated file). Ignore any that contain the placeholder `{PROJECT_NAME}` — those are uninitialized templates.
+4. **Set CCG_ROOT:**
+   - If exactly one valid CLAUDE.md is found → use its directory as CCG_ROOT
+   - If multiple valid CLAUDE.md files are found → list them and ask the user which project to recover
+   - If none found → this is a **first run**. Set CCG_ROOT to the current working directory and go to the First-Run Setup below.
 
-- If `CLAUDE.md` does **not exist**, or it **contains the placeholder text `{PROJECT_NAME}`** — this is a **first run**. Go to the First-Run Setup below.
-- If `CLAUDE.md` exists and does NOT contain `{PROJECT_NAME}` — this is a normal session. Skip to Step 1.
+**CRITICAL: All safeguard file paths in ALL subsequent steps are relative to CCG_ROOT, not the working directory.** When this skill says "read SESSION_LOG.md", it means `{CCG_ROOT}/SESSION_LOG.md`. When it says "run git status", `cd` into CCG_ROOT first if it differs from the working directory.
+
+## Step 0.5: First-Run Detection
+
+If Step 0 found a valid CLAUDE.md:
+- If it **contains the placeholder text `{PROJECT_NAME}`** — this is a **first run**. Go to the First-Run Setup below.
+- Otherwise — this is a normal session. Skip to Step 1.
 
 ### First-Run Setup
 
 **IMPORTANT: First-run setup is procedural, not a design task. Do NOT enter plan mode. Proceed directly with creating safeguard files. If plan mode is active, exit it before continuing.**
 
-1. **Check for templates:** Look for a `templates/` folder in the project root. If it doesn't exist, tell the user: "No templates/ folder found. Please run install.sh first or copy the templates/ folder from the Context Guard repo." Then stop.
+1. **Check for templates:** Look for a `templates/` folder in CCG_ROOT. If it doesn't exist, also search subdirectories: `find . -maxdepth 4 -name "templates" -type d`. If still not found, tell the user: "No templates/ folder found. Please run install.sh first or copy the templates/ folder from the Context Guard repo." Then stop.
 
 2. **Ask for project details:**
    > "Welcome to Claude Context Guard! Let's set up your project."
