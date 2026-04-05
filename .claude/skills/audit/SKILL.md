@@ -40,7 +40,8 @@ Safeguard files may not be in the current working directory — they could be in
 ## 3. Plan Cross-Reference
 - Read ALL plan files from `plans/` directory
 - For EVERY task/step in every plan, verify it exists in TASK_REGISTRY
-- Flag: tasks in plans NOT in registry = **DROPPED TASK (CRITICAL)**
+- If a task from a plan is NOT in the current registry, **check archive pages** (`TASK_REGISTRY_page*.md`) before flagging — it may have been completed and archived
+- Flag: tasks in plans NOT in registry AND NOT in any archive = **DROPPED TASK (CRITICAL)**
 - Flag: tasks in registry with no plan, decision, or comment source = **UNEXPLAINED TASK**
 
 ## 4. User Comments
@@ -78,6 +79,9 @@ Safeguard files may not be in the current working directory — they could be in
   - `FEATURE_LIST.json`
   - `CLAUDE.md`
 - **CRITICAL** if any file is missing or empty
+- Check for archive page files (`*_page*.md`). If they exist:
+  - Verify each has a valid header (file name, page number, session/entry range)
+  - Report as **INFO**: "N archive pages found for [file] — historical data preserved"
 
 ## 9. File Integrity
 - Count key files (agents, skills, etc. — project-specific)

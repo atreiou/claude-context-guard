@@ -106,11 +106,16 @@ If Step 0 found a valid CLAUDE.md:
 
 Read ALL of these files in order:
 1. `CLAUDE.md` — project rules and architecture
-2. `SESSION_LOG.md` — what happened in every previous session
-3. `TASK_REGISTRY.md` — every task ever created, find the PENDING ones
+2. `SESSION_LOG.md` — what happened in recent sessions
+3. `TASK_REGISTRY.md` — active and recent tasks, find the PENDING ones
 4. `DECISIONS.md` — architectural decisions, never contradict these
 5. `COMMENTS.md` — user's verbatim comments, check for unactioned ones
 6. `FEATURE_LIST.json` — feature pass/fail status
+
+**Archive awareness:** After reading each file, check for `_page*.md` archives (e.g. `SESSION_LOG_page1.md`, `TASK_REGISTRY_page1.md`). If archives exist:
+- Do NOT read them by default — they contain older history that was rotated out to save context
+- Note them in your Step 5 summary: "📁 N archive pages available for [file] — read if historical context needed"
+- Only read archives if cross-referencing in Step 3 reveals gaps (e.g. a plan references a task not found in the current TASK_REGISTRY)
 
 ## Step 2: Check Git State
 
@@ -160,7 +165,8 @@ Read the **last 3 plan files** from the `plans/` directory IN FULL.
 
 For each plan:
 - Check every task/step mentioned against TASK_REGISTRY.md
-- Flag any task that appears in a plan but NOT in the registry (DROPPED TASK — critical)
+- If a task appears in a plan but NOT in the current registry, **check archive pages** (`TASK_REGISTRY_page*.md`) before flagging — it may have been completed and archived
+- Flag any task that appears in a plan but is NOT in the registry OR any archive (DROPPED TASK — critical)
 - Flag any task in the registry with no corresponding plan, decision, or user comment (UNEXPLAINED TASK)
 
 ## Step 4: Determine Session Number

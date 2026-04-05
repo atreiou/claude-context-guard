@@ -71,6 +71,54 @@ Check and update ALL of these:
 ### FEATURE_LIST.json
 - If any features changed status (passes: false → true), update them
 
+## Step 2.5: Rotate Safeguard Files (Pagination)
+
+After updating safeguard files, check if any have grown too large and need rotation. You have full session context right now — use it to make smart archival decisions.
+
+**Threshold:** 300 lines. Skip this step if all files are under 300 lines.
+
+For each file over 300 lines, apply the appropriate rotation:
+
+### SESSION_LOG.md
+1. Count `## Session` headers. Keep the **last 3 sessions** in the main file.
+2. Everything above the 3rd-from-last `## Session` header → move to archive.
+3. Determine the next page number: check for existing `SESSION_LOG_page*.md` files. New page = highest existing + 1 (or 1 if none exist).
+4. Create `SESSION_LOG_pageN.md` with header:
+   ```
+   # SESSION_LOG — Archive Page N (Sessions X–Y)
+   # Current sessions: see SESSION_LOG.md
+   ---
+   [archived content]
+   ```
+5. Trim `SESSION_LOG.md`: keep the file header (lines before the first `## Session`) + the last 3 sessions.
+6. Add/update an archive reference line after the file header: `# 📁 Archives: SESSION_LOG_page1.md, SESSION_LOG_page2.md, ...`
+
+### TASK_REGISTRY.md
+1. Scan all task rows. Separate into:
+   - **Keep:** All non-done tasks (⏳ 🔄 ❌ 🔁) regardless of session + done tasks (✅) from the last 3 sessions
+   - **Archive:** Done tasks (✅) from sessions older than the last 3
+2. Create `TASK_REGISTRY_pageN.md` with archived done tasks, preserving their session headers.
+3. Trim the main file: keep file header + all non-done tasks + last 3 sessions of done tasks.
+4. Add/update archive reference line.
+
+### DECISIONS.md
+1. Review each decision using your session context. Identify **actioned decisions** — those fully implemented and no longer actively constraining current work.
+2. Move actioned decisions → `DECISIONS_pageN.md`.
+3. Keep all active/unactioned decisions in the main file.
+4. Add/update archive reference line.
+
+### COMMENTS.md
+1. Review each comment using your session context. Identify:
+   - **Actioned comments** — turned into decisions, tasks, or file changes
+   - **Curiosity questions** — exploratory/informational, not project directives
+2. Move both categories → `COMMENTS_pageN.md`.
+3. Keep all unactioned project directives in the main file.
+4. Add/update archive reference line.
+
+**FEATURE_LIST.json** — skip, stays compact.
+
+**If no files exceed 300 lines, skip this entire step.**
+
 ## Step 3: Git Commit & Push
 
 After updating safeguard files, commit everything to git so the save point is durable:
