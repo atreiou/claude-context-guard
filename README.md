@@ -16,13 +16,13 @@ This is a known issue. [Anthropic's own engineering team](https://www.anthropic.
 
 Context Guard creates a set of safeguard files that persist across sessions, plus five slash commands:
 
-- **`/start`** — Type this at the start of every session. Claude reads all safeguard files, cross-references recent plans against the task registry, flags any dropped or unexplained tasks, and summarises the project state. One command, full recovery.
+- **`/start`** — Type this at the start of every session. Claude reads all safeguard files, cross-references recent plans against the task registry, flags any dropped or unexplained tasks, detects and commits orphaned work from crashed sessions, and summarises the project state. Works from parent directories — automatically locates your project's Context Guard files in subdirectories. One command, full recovery.
 
-- **`/audit`** — Your personal safeguard. Call this at ANY moment to verify Claude's work. It runs a comprehensive integrity check across all files, plans, and git state.
+- **`/audit`** — Your personal safeguard. Call this at ANY moment to verify Claude's work. It runs a comprehensive integrity check across all files, plans, git state, and archived safeguard pages.
 
-- **`/save`** — Mid-session checkpoint. Saves all progress to safeguard files without git operations. Use during long sessions or any time you want an explicit save point.
+- **`/save`** — Mid-session checkpoint. Saves all progress to safeguard files, commits, and pushes. Automatically paginates safeguard files that have grown too large — archiving older content to keep context lean for future sessions. Use during long sessions or any time you want an explicit save point.
 
-- **`/end`** — Optional session save point. When you're done for the day, type `/end` and Claude will update all safeguard files, commit any uncommitted work, push to remote, and report a clean summary. Not required — `/start` handles recovery regardless — but useful when you want an explicit clean handoff.
+- **`/end`** — Optional session save point. When you're done for the day, type `/end` and Claude will update all safeguard files, paginate if needed, archive plans, commit, push (including to backup remotes if configured), and report a clean summary. Not required — `/start` handles recovery regardless — but useful when you want an explicit clean handoff.
 
 - **`/itemise`** — Apply the Itemisation Protocol to your code files. Numbers sections, functions, and meaningful blocks so every part of the code is referenceable by address. Backs up files first, verifies nothing changed except the added numbers, then removes backups. Can be toggled off in `CLAUDE.md` for projects that don't want it.
 
@@ -58,12 +58,13 @@ From then on, `/start` reads your existing safeguard files and recovers full con
 | File | Purpose |
 |------|---------|
 | `CLAUDE.md` | Auto-read every session. Project rules and pointers to other files |
-| `SESSION_LOG.md` | Running history of what happened each session |
-| `TASK_REGISTRY.md` | Every task ever created, with status. Nothing gets dropped |
-| `DECISIONS.md` | Architectural decisions register. The "why" behind every choice |
-| `COMMENTS.md` | Your verbatim comments logged as a safety net |
+| `SESSION_LOG.md` | Running history of what happened each session. Auto-paginated when large |
+| `TASK_REGISTRY.md` | Every task ever created, with status. Nothing gets dropped. Auto-paginated when large |
+| `DECISIONS.md` | Architectural decisions register. The "why" behind every choice. Auto-paginated when large |
+| `COMMENTS.md` | Your verbatim comments logged as a safety net. Auto-paginated when large |
 | `FEATURE_LIST.json` | Pass/fail feature tracker (JSON — harder for LLMs to accidentally overwrite) |
 | `plans/` | Archived plans from every session, cross-referenced by /start and /audit |
+| `*_page*.md` | Auto-generated archive pages when safeguard files exceed 300 lines |
 
 ### What Gets Configured
 
@@ -71,8 +72,8 @@ From then on, `/start` reads your existing safeguard files and recovers full con
 |-----------|---------|
 | `/start` skill | Session recovery — one command to restore full context |
 | `/audit` skill | On-demand integrity check — verify Claude's work at any moment |
-| `/save` skill | Mid-session checkpoint — update safeguard files without git operations |
-| `/end` skill | Optional session save point — clean wrap-up with commit and push |
+| `/save` skill | Mid-session checkpoint — update safeguard files, commit, push, and paginate |
+| `/end` skill | Optional session save point — clean wrap-up with commit, push, and backup sync |
 | `/itemise` skill | Itemisation Protocol — numbered code addressing with backup and integrity verification |
 | Pre-commit hook | Reminds Claude to update safeguard files before every git commit |
 | Pre-compaction hook | Automatically saves all progress before context compression — no data loss |
@@ -81,12 +82,13 @@ From then on, `/start` reads your existing safeguard files and recovers full con
 
 ### Session Start (`/start`)
 
-1. Reads all safeguard files (session log, task registry, decisions, comments, features)
-2. Reads the last 3 archived plans **in full**
-3. Cross-references every plan item against the task registry
-4. Flags dropped tasks (in plan but not in registry) and unexplained tasks (in registry but no source)
-5. Checks git state for uncommitted or unpushed work
-6. Summarises everything and waits for your confirmation
+1. Locates Context Guard files — searches subdirectories up to 4 levels deep, so you can launch from a parent directory
+2. Reads all current safeguard files (paginated archives are noted but not loaded — keeping context lean)
+3. Checks git state — detects and commits orphaned work from crashed or overflowed sessions
+4. Reads the last 3 archived plans **in full**
+5. Cross-references every plan item against the task registry
+6. Flags dropped tasks (in plan but not in registry) and unexplained tasks (in registry but no source)
+7. Summarises everything and waits for your confirmation
 
 ### On-Demand Audit (`/audit`)
 
@@ -102,22 +104,25 @@ Everything `/start` does, plus:
 When you're ready to stop working, type `/end`. Claude will:
 1. Review everything done this session
 2. Update all safeguard files (session log, task registry, comments, decisions, features)
-3. Archive any unarchived plans
-4. Commit and push all changes
-5. Verify clean git state
-6. Report a summary of the session and what's pending for next time
+3. Paginate any safeguard files over 300 lines — archiving older content to keep future `/start` loads lean
+4. Archive any unarchived plans
+5. Commit and push all changes (including backup remotes if configured)
+6. Verify clean git state
+7. Report a summary of the session and what's pending for next time
 
 This is entirely optional — `/start` will recover context regardless. But `/end` gives you a guaranteed clean save point.
 
 ### Mid-Session Checkpoint (`/save`)
 
-A lightweight save point you can run at any time during a session. Claude will:
+A durable save point you can run at any time during a session. Claude will:
 1. Check for any unlogged comments, tasks, or decisions
 2. Update all safeguard files with current progress
-3. Add a checkpoint marker to the session log
-4. Confirm what was saved
+3. Paginate any safeguard files over 300 lines — archiving older content automatically
+4. Add a checkpoint marker to the session log with an "in flight" handoff note
+5. Commit and push all changes
+6. Confirm what was saved
 
-No git operations, no plan archiving — just a quick save. Use it when a session is running long, before a risky operation, or any time you want peace of mind.
+Use it when a session is running long, before a risky operation, or any time you want peace of mind.
 
 ### Itemisation Protocol (`/itemise`)
 
@@ -162,6 +167,24 @@ add_action('wp_enqueue_scripts', function() {
 
 **Safety:** `/itemise` creates `{filename}.itemise-backup` copies before touching anything, verifies integrity after (strips added comment-numbers and diffs against the backup to confirm no code changed), and restores from backup on any failure.
 
+### Safeguard File Pagination
+
+As projects grow, safeguard files accumulate history that eats into the context window on every `/start`. Context Guard handles this automatically — when any safeguard file exceeds 300 lines, `/save` and `/end` archive older content into numbered page files:
+
+- `SESSION_LOG_page1.md`, `SESSION_LOG_page2.md`, etc.
+- `TASK_REGISTRY_page1.md`, etc.
+
+Each file type has its own archival strategy:
+
+| File | What stays in the main file | What gets archived |
+|------|---------------------------|-------------------|
+| SESSION_LOG | Last 3 sessions | Older session entries |
+| TASK_REGISTRY | All active tasks (pending/in-progress/blocked) + last 3 sessions of done tasks | Older completed tasks |
+| DECISIONS | Active/unactioned decisions | Fully implemented decisions |
+| COMMENTS | Unactioned project directives | Actioned comments and curiosity questions |
+
+Archives are never deleted — they're available for reference via `/audit` or when explicitly requested. `/start` notes their existence but doesn't read them, keeping context lean for actual work.
+
 ### Automatic Pre-Compaction Save
 
 When Claude Code is about to compress your conversation (context compaction), a `PreCompact` hook fires automatically and backs up all safeguard files to a timestamped `compaction-backups/` directory. This is a safety net — if safeguard files weren't fully up to date when compaction hit, the backup preserves the last known state.
@@ -194,7 +217,7 @@ Context Guard was born from three years of practical experience fighting context
 1. **External state over in-context memory** — files survive, context windows don't
 2. **JSON for structured data** — LLMs are less likely to accidentally overwrite JSON than markdown
 3. **Cross-referencing over trust** — verify plans against registries, don't assume tasks were completed
-4. **Minimal context loading** — read indexes first, fetch specifics only when needed
+4. **Minimal context loading** — read current files only, archive old content automatically, fetch specifics only when needed
 5. **User can audit at any time** — transparency and accountability built in
 6. **Referenceable code** — every block has an address, LLMs don't need full file context to find it
 
