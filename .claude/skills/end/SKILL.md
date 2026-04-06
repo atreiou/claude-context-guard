@@ -115,6 +115,31 @@ For each file over 300 lines, apply the appropriate rotation:
 
 **If no files exceed 300 lines, skip this entire step.**
 
+## Step 2.8: Verify Update Completion
+
+Before proceeding to git, confirm every safeguard file was addressed. Output this checklist:
+
+**Update verification:**
+- SESSION_LOG.md — [updated / already current — reason]
+- TASK_REGISTRY.md — [N tasks added/updated / no task changes — reason]
+- COMMENTS.md — [N comments logged / no new comments this session]
+- DECISIONS.md — [N decisions logged / no new decisions — checked: no architecture choices, algorithm choices, UI patterns, data model changes, naming conventions, or approach reversals this session]
+- FEATURE_LIST.json — [N features updated / no feature status changes — checked: no features changed pass/fail, no new sub-features, no significant rework]
+
+**Decision trigger check:** Were ANY of these made this session?
+  Architecture choices, algorithm/approach selections, UI/UX pattern decisions,
+  data model changes, naming conventions, technology selections, approach reversals,
+  workflow changes, configuration decisions.
+  If yes and DECISIONS.md wasn't updated → go back and update it now.
+
+**Feature trigger check:** Did ANY feature change status this session?
+  New features added, existing features passing/failing, sub-features created,
+  significant feature rework.
+  If yes and FEATURE_LIST.json wasn't updated → go back and update it now.
+
+If any file shows 0 changes, the reason must be specific (not "no changes needed").
+"No changes needed" without explanation is not acceptable — state what you checked.
+
 ## Step 3: Archive Plans
 
 - Check `~/.claude/plans/` for plans belonging to this project
@@ -127,17 +152,21 @@ For each file over 300 lines, apply the appropriate rotation:
 - Copy matched plans to `plans/S{session}-{seq}_{description}.md`
 - **DO NOT EXECUTE archived plans.** /end is a save point, not an execution trigger. If a plan was approved but not yet implemented, mark its tasks as ⏳ pending in TASK_REGISTRY.md and record it in SESSION_LOG.md's "Next step" field so /start picks it up.
 
+**Proof of check:** For each .md file examined in `~/.claude/plans/`, state:
+- Filename
+- First line of content (or "empty/unreadable")
+- Verdict: "matches this project — archived as [destination]" or "different project ([name]) — skipped" or "ambiguous — skipped"
+
+Do not use the word "likely". Either you read the file and it matches, or it doesn't.
+
 ## Step 4: Git Commit & Push
 
 - Run `git status` to see what's uncommitted
 - Stage and commit all changes with a descriptive message
 - Tag with the project's commit tagging convention
 - Push to remote (including tags)
-- **Backup remote:** If a `backup` remote exists (`git remote | grep backup`), also push to it:
-  ```
-  git checkout dev && git merge main --no-edit && git push backup dev && git checkout main
-  ```
-  This keeps the private backup in sync. If no `backup` remote exists, skip this.
+- **Backup remote (CCG only):** This step applies only to the Context Guard source-of-truth repo, which uses a dual-remote setup: `origin` (public) + `backup` (private dev). Most projects have a single `origin` remote — that IS their backup. If you're on a project with only `origin`, skip this step. Do NOT flag a missing `backup` remote as an issue.
+  If a `backup` remote exists: `git checkout dev && git merge main --no-edit && git push backup dev && git checkout main`
 
 ## Step 5: Verify Clean State
 
