@@ -42,6 +42,23 @@ Update safeguard files (SESSION_LOG.md, TASK_REGISTRY.md, COMMENTS.md) IMMEDIATE
 
 Do NOT wait for /end. Treat safeguard files as a running log, updated incrementally. When saving, capture not just what was completed but what is **in flight** — the current approach, state, and next micro-step. If context is lost, this is the handoff note.
 
+## INCREMENTAL COMMIT PROTOCOL
+
+When a block of work is completed and the user has approved it, commit immediately — do not wait for /end. Approval includes any positive acknowledgement: "looks good", "nice", "cool, let's move on", "yes", accepting the output and giving a new instruction, etc. Explicit "please commit" is NOT required.
+
+Before committing, verify:
+1. The changes match what was discussed and approved in the conversation
+2. No half-finished or unapproved changes are included in the staged files
+3. The commit message accurately describes the approved work
+
+Tag the commit if it completes a distinct task. This applies even if more work follows in the same session.
+
+If a session ends without /end (context overflow, crash, rate limit):
+- The incremental commits preserve all approved work
+- The next /start will detect any remaining uncommitted changes
+
+If a session has multiple user-approved task completions but zero commits, something is wrong.
+
 ## AUTOMATIC PRE-COMPACTION SAVE
 
 A PreCompact hook automatically backs up all safeguard files before Claude Code compresses the conversation. Copies are saved to `compaction-backups/YYYY-MM-DD_HHMMSS/`. This is a safety net — if context is lost and safeguard files weren't fully up to date, the backup preserves the last known state. The hook runs automatically; no action is needed from you or the user.
@@ -85,6 +102,16 @@ When the user types a message containing `/word` where `word` matches a skill na
   - Push tags with: `git push --tags`
 - Push to remote after every commit: `git push && git push --tags`
 - All amendment comments use format: `<!-- AMENDMENT vX.Y (YYYY-MM-DD): description -->`
+
+## Version Control
+
+- **Mode:** remote
+- **Branch:** main
+
+Skills read this section to determine git behaviour:
+- `remote` — commit + push + tags (default)
+- `local` — commit + tags only, no push
+- `none` — skip all git steps in /start, /save, /end, /audit
 
 ## Plan Archiving
 

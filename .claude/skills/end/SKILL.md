@@ -161,10 +161,25 @@ Do not use the word "likely". Either you read the file and it matches, or it doe
 
 ## Step 4: Git Commit & Push
 
-- Run `git status` to see what's uncommitted
-- Stage and commit all changes with a descriptive message
-- Tag with the project's commit tagging convention
-- Push to remote (including tags)
+Check CLAUDE.md "Version Control" section:
+- If mode is "none" → skip this entire step
+- If mode is "local" → commit and tag only, no push
+- If mode is "remote" → commit, tag, push (default behaviour if no Version Control section exists)
+
+1. Run `git status` to see ALL modified and untracked files
+2. For EVERY modified file shown, cross-reference with the conversation to confirm the changes were approved (any positive acknowledgement counts — "looks good", "cool", accepting and moving on, etc.):
+   - If approved this session → stage it
+   - If from a prior session (orphaned work) → check SESSION_LOG/TASK_REGISTRY for approval context. If the work was part of a completed task, stage it AND note in the commit message: "Includes orphaned work from S[N]"
+   - If unapproved or unclear → ask the user before staging
+   - If it should NOT be committed (temp files, diagnostics) → explicitly list it as excluded with reason
+3. For EVERY untracked file shown:
+   - If it's project code or safeguard files → stage it
+   - If it's a temp/diagnostic file → add to .gitignore or explicitly exclude with reason
+4. Commit with a descriptive message
+5. Tag with the project's commit tagging convention
+6. Run `git status` AFTER committing — it MUST show "nothing to commit, working tree clean" (excluding gitignored files)
+7. If working tree is NOT clean after commit → something was missed, go back
+8. Push to remote (including tags)
 - **Backup remote (CCG only):** This step applies only to the Context Guard source-of-truth repo, which uses a dual-remote setup: `origin` (public) + `backup` (private dev). Most projects have a single `origin` remote — that IS their backup. If you're on a project with only `origin`, skip this step. Do NOT flag a missing `backup` remote as an issue.
   If a `backup` remote exists: `git checkout dev && git merge main --no-edit && git push backup dev && git checkout main`
 

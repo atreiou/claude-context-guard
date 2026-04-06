@@ -59,6 +59,19 @@ If Step 0 found a valid CLAUDE.md:
    - Replace `{PROJECT_DESCRIPTION}` with their description (or "TODO" if skipped)
    - Replace `{DATE}` with today's date
 
+4.5. **Configure version control:**
+
+   Ask:
+   > "How would you like version control handled?"
+   > 1. **Local git + remote** — commit and push (most common)
+   > 2. **Local git only** — commit but never push
+   > 3. **No git** — skip all version control
+
+   Based on their answer, update the `## Version Control` section in CLAUDE.md:
+   - Option 1: set Mode to `remote`
+   - Option 2: set Mode to `local`
+   - Option 3: set Mode to `none`
+
 5. **Initialise SESSION_LOG.md:**
    - Add a Session 1 entry:
    ```
@@ -141,11 +154,16 @@ If the dates match or the session log is current, continue normally.
 
 ## Step 2.7: Commit Orphaned Work
 
+Check CLAUDE.md "Version Control" section:
+- If mode is "none" → skip this entire step
+- If mode is "local" → commit only, no push
+- If mode is "remote" → commit and push (default behaviour if no Version Control section exists)
+
 If Step 2 found **uncommitted changes** (modified or untracked files), a previous session likely ended without `/end` (context overflow, rate limit, crash). This work must be committed before proceeding.
 
 1. **Run `git status`** to see all uncommitted and untracked files
 2. **Review the changes** — run `git diff` and `git diff --cached` to understand what was done
-3. **Cross-reference with TASK_REGISTRY.md and SESSION_LOG.md** — identify which session produced these changes and what tasks they relate to
+3. **Cross-reference with TASK_REGISTRY.md and SESSION_LOG.md** — identify which session produced these changes, what tasks they relate to, and confirm the work was approved (completed tasks, user-acknowledged output, etc.)
 4. **Stage and commit** with a descriptive message summarising the orphaned work:
    ```
    git add [relevant files]
@@ -158,6 +176,8 @@ If Step 2 found **uncommitted changes** (modified or untracked files), a previou
 If there are **unpushed commits** (committed but not pushed), push them now: `git push && git push --tags`
 
 If the working tree is clean and all commits are pushed, skip this step.
+
+**IMPORTANT:** Do NOT proceed to Step 3 until `git status` shows a clean working tree (no modified or untracked project files, excluding gitignored files). All orphaned work must be committed first.
 
 ## Step 3: Cross-Reference Plans
 

@@ -146,17 +146,18 @@ If any file shows 0 changes, the reason must be specific (not "no changes needed
 
 ## Step 3: Git Commit & Push
 
+Check CLAUDE.md "Version Control" section:
+- If mode is "none" → skip this entire step
+- If mode is "local" → commit only, no push
+- If mode is "remote" → commit and push (default behaviour if no Version Control section exists)
+
 After updating safeguard files, commit everything to git so the save point is durable:
 
-1. **Stage all changes** — safeguard files AND any code changes since the last commit:
-   ```
-   git add [all modified and new files]
-   ```
-2. **Commit** with a descriptive message:
-   ```
-   git commit -m "Checkpoint: [brief summary of work since last commit]"
-   ```
-3. **Push** to remote: `git push`
+1. Run `git status` to see ALL modified and untracked files
+2. Stage safeguard files AND any approved code changes since the last commit
+3. Commit with a descriptive message: `"Checkpoint: [brief summary]"`
+4. Push to remote: `git push`
+5. If `git status` still shows uncommitted project files after the commit, something was missed — go back
 
 If there are no changes to commit (everything is already committed), skip this step.
 
