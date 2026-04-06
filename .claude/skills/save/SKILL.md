@@ -119,6 +119,31 @@ For each file over 300 lines, apply the appropriate rotation:
 
 **If no files exceed 300 lines, skip this entire step.**
 
+## Step 2.8: Verify Update Completion
+
+Before proceeding to git, confirm every safeguard file was addressed. Output this checklist:
+
+**Update verification:**
+- SESSION_LOG.md — [updated / already current — reason]
+- TASK_REGISTRY.md — [N tasks added/updated / no task changes — reason]
+- COMMENTS.md — [N comments logged / no new comments this session]
+- DECISIONS.md — [N decisions logged / no new decisions — checked: no architecture choices, algorithm choices, UI patterns, data model changes, naming conventions, or approach reversals this session]
+- FEATURE_LIST.json — [N features updated / no feature status changes — checked: no features changed pass/fail, no new sub-features, no significant rework]
+
+**Decision trigger check:** Were ANY of these made this session?
+  Architecture choices, algorithm/approach selections, UI/UX pattern decisions,
+  data model changes, naming conventions, technology selections, approach reversals,
+  workflow changes, configuration decisions.
+  If yes and DECISIONS.md wasn't updated → go back and update it now.
+
+**Feature trigger check:** Did ANY feature change status this session?
+  New features added, existing features passing/failing, sub-features created,
+  significant feature rework.
+  If yes and FEATURE_LIST.json wasn't updated → go back and update it now.
+
+If any file shows 0 changes, the reason must be specific (not "no changes needed").
+"No changes needed" without explanation is not acceptable — state what you checked.
+
 ## Step 3: Git Commit & Push
 
 After updating safeguard files, commit everything to git so the save point is durable:
