@@ -123,3 +123,21 @@
 > [2026-04-05] "Obviously don't bother updating anything until after you've added the new page feature to help keep context bloat down due to extended records." — Rob on prioritising pagination before syncing. **Actioned:** Pagination implemented first, then all syncs.
 
 > [2026-04-05] "Ok great, now update the Journey.AI kit ready for upload later this evening please." — Rob requesting kit bundle rebuild. **Actioned:** S11-008.
+
+## Session 12 — 2026-04-06
+
+> [2026-04-06] [Shared detailed /end failure report from seeko-child agent] — Rob providing diagnostic evidence of /end skipping DECISIONS.md, FEATURE_LIST.json, and guessing at plan archival. **Actioned:** S12-001, S12-002, D-017, D-018.
+
+> [2026-04-06] "The socials.club agents is saying there's no backup remote!?" — Rob on consumer projects flagging missing backup. **Actioned:** D-019, S12-003.
+
+> [2026-04-06] "Okay, yeah, that makes sense. Right, in which case, draw up a plan to fix everything, please." — Rob approving plan for /end verification fix. **Actioned:** Plan created and executed.
+
+> [2026-04-06] "Fantastic - now please update the journey.ai kit and publish it to the platform." — Rob requesting kit rebuild + publish. **Actioned:** S12-005, S12-006.
+
+> [2026-04-06] "Obviously I expect that none of those paths are my local paths as they give personal details about my user name on my home computer etc" — Rob on sanitization of kit bundle. **Actioned:** Verified sanitize() removes all personal paths.
+
+> [2026-04-06] "Then write something like: 'if you do not complete this, the save will be incomplete and context will be lost.'" — Rob on maintaining effectiveness while softening language for safety scanner. **Actioned:** D-020, soften_for_publish().
+
+> [2026-04-06] "It is an anti-prompt injection protocol I think" — Rob correctly diagnosing JourneyKits safety scanner. **Noted.**
+
+> [2026-04-06] "Oh wait - it says there is no readme!? That's super important and should be fully formed on the main source repo." — Rob on JourneyKits showing README missing badge. **Actioned:** D-021, S12-007, rebuild_bundle.py updated to pull README into kitDoc.
