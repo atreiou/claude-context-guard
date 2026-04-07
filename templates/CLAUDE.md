@@ -14,7 +14,7 @@
 
 ## SAFEGUARD FILE PAGINATION
 
-Safeguard files are automatically paginated to prevent context bloat. When a file exceeds 300 lines, `/save` and `/end` archive older content into numbered page files (e.g. `SESSION_LOG_page1.md`, `TASK_REGISTRY_page2.md`). The main file always contains the most recent/active content. Archive pages are NOT auto-read by `/start` — they exist for reference when historical context is needed or when cross-referencing reveals gaps. Never delete archive pages.
+Safeguard files are automatically paginated by `/save` and `/end` every session — not just when they get large. SESSION_LOG and TASK_REGISTRY keep the last 5 sessions; older done tasks and session entries are archived into numbered page files (e.g. `SESSION_LOG_page1.md`, `TASK_REGISTRY_page2.md`). DECISIONS and COMMENTS archive anything that has been fully actioned. The main file always contains the most recent/active content. Archive pages are NOT auto-read by `/start` — they exist for reference when historical context is needed or when cross-referencing reveals gaps. Never delete archive pages.
 
 ## DROPPING TASKS IS ABSOLUTELY UNACCEPTABLE
 
