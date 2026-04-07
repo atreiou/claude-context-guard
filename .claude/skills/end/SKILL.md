@@ -152,12 +152,7 @@ If any file shows 0 changes, the reason must be specific (not "no changes needed
 - Copy matched plans to `plans/S{session}-{seq}_{description}.md`
 - **DO NOT EXECUTE archived plans.** /end is a save point, not an execution trigger. If a plan was approved but not yet implemented, mark its tasks as ⏳ pending in TASK_REGISTRY.md and record it in SESSION_LOG.md's "Next step" field so /start picks it up.
 
-**Proof of check:** Only examine the **5 most recently modified** `.md` files in `~/.claude/plans/`. For each, state:
-- Filename
-- First line of content (or "empty/unreadable")
-- Verdict: "matches this project — archived as [destination]" or "different project ([name]) — skipped" or "ambiguous — skipped"
-
-Do not use the word "likely". Either you read the file and it matches, or it doesn't.
+**Internal verification:** Check the **5 most recently modified** `.md` files in `~/.claude/plans/`. Read each file's first ~500 characters, match against the project name, and archive any that belong to this project. Do not output the verification details — just report the result: either "Archived N plans: [list]" or "No new project plans found to archive."
 
 ## Step 4: Git Commit & Push
 
