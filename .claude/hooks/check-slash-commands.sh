@@ -3,11 +3,11 @@
 # Detects when the user types a /command matching an installed skill
 # and reminds Claude to invoke it via the Skill tool.
 # Runs as a UserPromptSubmit hook.
+# No external dependencies (jq-free).
 
 INPUT=$(cat)
-MESSAGE=$(echo "$INPUT" | jq -r '.user_message // empty')
 
-if [ -z "$MESSAGE" ]; then
+if [ -z "$INPUT" ]; then
   exit 0
 fi
 
@@ -15,6 +15,36 @@ fi
 SKILLS_DIR="$CLAUDE_PROJECT_DIR/.claude/skills"
 
 if [ ! -d "$SKILLS_DIR" ]; then
+  exit 0
+fi
+
+# Extract user_message from JSON without jq.
+# Try Python 3 first (most reliable), then Python 2, then fall back to grep.
+MESSAGE=""
+
+if command -v python3 &>/dev/null; then
+  MESSAGE=$(echo "$INPUT" | python3 -c "
+import sys, json
+try:
+    print(json.load(sys.stdin).get('user_message', ''))
+except Exception:
+    pass
+" 2>/dev/null)
+elif command -v python &>/dev/null; then
+  MESSAGE=$(echo "$INPUT" | python -c "
+import sys, json
+try:
+    print(json.load(sys.stdin).get('user_message', ''))
+except Exception:
+    pass
+" 2>/dev/null)
+else
+  # Last resort: pull the user_message value via grep.
+  # Works for simple single-line messages; may miss escaped/multi-line content.
+  MESSAGE=$(echo "$INPUT" | grep -oE '"user_message"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"user_message"[[:space:]]*:[[:space:]]*"\(.*\)"/\1/')
+fi
+
+if [ -z "$MESSAGE" ]; then
   exit 0
 fi
 
