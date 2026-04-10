@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Full project integrity audit. Checks all safeguard files, git state, uncommitted work, plan cross-references, and task registry for completeness. Type /audit at any time to verify project integrity.
+description: "Type /audit to verify project integrity. Checks all safeguard files, git state, uncommitted work, plan cross-references, and task registry for completeness."
 disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Write
 ---

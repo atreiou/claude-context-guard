@@ -1,6 +1,6 @@
 ---
 name: save
-description: Mid-session checkpoint. Updates all safeguard files with current progress. A quick save point that protects against context loss during long sessions. Type /save during a session to checkpoint progress.
+description: "Type /save to checkpoint progress mid-session. Updates all safeguard files without ending the session. Protects against context loss during long sessions."
 disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
