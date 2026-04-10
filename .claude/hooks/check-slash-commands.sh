@@ -63,7 +63,10 @@ fi
 # Check each command against installed skills
 for CMD in $COMMANDS; do
   if [ -d "$SKILLS_DIR/$CMD" ] && [ -f "$SKILLS_DIR/$CMD/SKILL.md" ]; then
-    echo "SLASH COMMAND DETECTED: /$CMD — You MUST invoke this via the Skill tool: Skill(skill=\"$CMD\"). Do NOT manually replicate the skill's steps." >&2
+    # Output to stdout (model context in Claude Code 2.1.92+) and stderr (older versions)
+    MSG="SLASH COMMAND DETECTED: /$CMD — You MUST invoke this via the Skill tool: Skill(skill=\"$CMD\"). Do NOT manually replicate the skill's steps."
+    echo "$MSG"
+    echo "$MSG" >&2
   fi
 done
 
