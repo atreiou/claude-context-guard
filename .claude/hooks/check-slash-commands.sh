@@ -11,8 +11,13 @@ if [ -z "$INPUT" ]; then
   exit 0
 fi
 
-# Find the project directory (where .claude/skills/ lives)
-SKILLS_DIR="$CLAUDE_PROJECT_DIR/.claude/skills"
+# Derive the project root from this script's own location.
+# The hook lives at .claude/hooks/check-slash-commands.sh, so
+# two directories up is the project root — regardless of whether
+# $CLAUDE_PROJECT_DIR is set in the hook's environment.
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+SKILLS_DIR="$PROJECT_DIR/.claude/skills"
 
 if [ ! -d "$SKILLS_DIR" ]; then
   exit 0

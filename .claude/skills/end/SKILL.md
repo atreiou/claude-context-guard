@@ -1,6 +1,6 @@
 ---
 name: end
-description: Session save point. Updates all safeguard files, commits uncommitted work, and ensures a clean handoff for the next session. Optional — use when you want to cleanly wrap up before stopping.
+description: Session save point. Updates all safeguard files, commits uncommitted work, and ensures a clean handoff for the next session. Type /end at the end of a session to cleanly wrap up.
 disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
