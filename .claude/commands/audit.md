@@ -51,6 +51,8 @@ Safeguard files may not be in the current working directory — they could be in
 - Read `DECISIONS.md`
 - Verify decision count
 - Check for contradictions between decisions
+- **Classification sanity check:** flag any decision missing a `Category:` field. Valid values: `forever-active`, `active-constraint`, `feature-specific`, `superseded`. Report missing categories as **WARNING — needs classification**.
+- **Cross-reference check:** for any decision with an `Affects:` field listing task IDs, verify those tasks exist in TASK_REGISTRY (or its archives). Stale task references = **INFO — update Affects: field**.
 
 ## 6. Session Log
 - Read `SESSION_LOG.md`
@@ -70,13 +72,16 @@ Safeguard files may not be in the current working directory — they could be in
 
 ## 8. Safeguard File Existence
 - Verify ALL safeguard files exist at their expected paths and are non-empty:
+  - `CLAUDE.md`
+  - `RESUME_STATE.md`
   - `SESSION_LOG.md`
   - `TASK_REGISTRY.md`
   - `DECISIONS.md`
+  - `LEARNED_BEHAVIOUR.md`
   - `COMMENTS.md`
   - `FEATURE_LIST.json`
-  - `CLAUDE.md`
 - **CRITICAL** if any file is missing or empty
+- **RESUME_STATE.md integrity:** If `Clean save: false` but the last session has a `## Session` entry in SESSION_LOG.md, something is inconsistent. Flag as **WARNING**.
 - Check for archive page files (`*_page*.md`). If they exist:
   - Verify each has a valid header (file name, page number, session/entry range)
   - Report as **INFO**: "N archive pages found for [file] — historical data preserved"

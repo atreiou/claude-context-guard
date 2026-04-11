@@ -119,7 +119,7 @@ else
 fi
 # end of 4.3
 
-# 4.4 Copy templates
+# 4.4 Copy templates (includes LEARNED_BEHAVIOUR.md and RESUME_STATE.md)
 # Copy templates
 echo "  Copying templates..."
 mkdir -p "$TARGET/templates"

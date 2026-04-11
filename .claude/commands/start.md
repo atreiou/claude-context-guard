@@ -50,6 +50,8 @@ If Step 0 found a valid CLAUDE.md:
    - Copy `templates/DECISIONS.md` → `DECISIONS.md`
    - Copy `templates/COMMENTS.md` → `COMMENTS.md`
    - Copy `templates/FEATURE_LIST.json` → `FEATURE_LIST.json`
+   - Copy `templates/LEARNED_BEHAVIOUR.md` → `LEARNED_BEHAVIOUR.md`
+   - Copy `templates/RESUME_STATE.md` → `RESUME_STATE.md`
    - Create `plans/` directory if it doesn't exist
 
 4. **Populate placeholders in CLAUDE.md:**
@@ -91,9 +93,11 @@ If Step 0 found a valid CLAUDE.md:
    - CLAUDE.md — project instructions (auto-read every session)
    - SESSION_LOG.md — session history
    - TASK_REGISTRY.md — task tracker
-   - DECISIONS.md — decisions register
+   - DECISIONS.md — architectural decisions register (with Category field)
+   - LEARNED_BEHAVIOUR.md — tactical knowledge / platform gotchas log
    - COMMENTS.md — user comments log
-   - FEATURE_LIST.json — feature tracker
+   - FEATURE_LIST.json — QA tracker (manually-verified features)
+   - RESUME_STATE.md — in-flight state for rate-limit / mid-task recovery
    - plans/ — plan archive directory
 
    ### Next Steps
@@ -115,15 +119,20 @@ If Step 0 found a valid CLAUDE.md:
 
 ## Step 1: Read Safeguard Files
 
-Read ALL of these files in order:
-1. `CLAUDE.md` — project rules and architecture
+Read files in this order:
+
+0. **`RESUME_STATE.md` — READ THIS FIRST.** This file holds only the in-flight state from the last /save. If `Clean save: false`, the previous session was interrupted mid-task — the In-flight and Next step sections are your handoff note. Surface this in the Step 5 summary under a `🔄 Resume from last session` heading so the user knows you picked it up. If `Clean save: true`, the previous session ended cleanly and RESUME_STATE is empty — skip ahead.
+1. `CLAUDE.md` — project rules and architecture. Parse the `## Custom Context Files` section for any project-specific files to load.
 2. `SESSION_LOG.md` — what happened in recent sessions
 3. `TASK_REGISTRY.md` — active and recent tasks, find the PENDING ones
-4. `DECISIONS.md` — architectural decisions, never contradict these
-5. `COMMENTS.md` — user's verbatim comments, check for unactioned ones
-6. `FEATURE_LIST.json` — feature pass/fail status
+4. `DECISIONS.md` — architectural decisions with Category field, never contradict these
+5. `LEARNED_BEHAVIOUR.md` — tactical knowledge, platform gotchas, workarounds (if present — skip if not initialised yet)
+6. `COMMENTS.md` — user's verbatim comments, check for unactioned ones
+7. `FEATURE_LIST.json` — QA pass/fail tracker (manually-verified features, NOT task-completion mirror)
 
-**Archive awareness:** After reading each file, check for `_page*.md` archives (e.g. `SESSION_LOG_page1.md`, `TASK_REGISTRY_page1.md`). If archives exist:
+**Custom context files:** After reading `CLAUDE.md`, scan its `## Custom Context Files` section. For every declared entry (lines matching `- path/to/file.md — purpose`), read the referenced file. Skip any that don't exist — don't fail the startup.
+
+**Archive awareness:** After reading each file, check for `_page*.md` archives (e.g. `SESSION_LOG_page1.md`, `TASK_REGISTRY_page1.md`, `DECISIONS_page1.md`, `LEARNED_BEHAVIOUR_page1.md`). If archives exist:
 - Do NOT read them — they contain older history that was rotated out to save context
 - Note them in your Step 5 summary: "📁 N archive pages available for [file]"
 - Only read archives if the user explicitly asks you to, or if you genuinely feel something is missing and cannot make sense of the current files without historical context
@@ -193,16 +202,42 @@ The new session number = last session in SESSION_LOG.md + 1.
 
 ## Step 5: Summarise
 
-Present a clear summary:
+### Internal context acknowledgement (do NOT output to user)
+
+Silently complete this checklist before composing the user summary. This is a self-check to confirm you absorbed the context — the output goes into your own working memory, not the chat:
+
+- Active decisions loaded: [N] (most recent: D-xx from S[yy])
+- Forever-active rules: [N] (brief mental list — style, brand, philosophy)
+- Feature QA status: [X passing / Y failing / Z untested]
+- Learned behaviours loaded: [N entries]
+- Custom context files loaded: [list from CLAUDE.md Custom Context Files section]
+- Decisions revised in the last 3 sessions: [list, or "none"]
+- New learned behaviours since last /start: [list, or "none"]
+- Resume state: [Clean / Interrupted — resume from RESUME_STATE.md]
+
+Any non-empty recent item → surface in the user summary below. Otherwise stay silent on it — no "None" placeholders, that's noise.
+
+### User-visible summary
+
+Present a clear summary. Only include sections that have content — omit empty ones.
 
 ```
 ## Session [N] — Context Recovery
+
+### 🔄 Resume from last session (only if RESUME_STATE.md Clean save: false)
+[Prepend the In-flight and Next step content verbatim from RESUME_STATE.md]
 
 ### Last Session ([N-1])
 [What was done]
 
 ### Pending Tasks
 [List from TASK_REGISTRY with pending status]
+
+### ⚠️ Recently revised (only if non-empty)
+[Decisions revised in the last 3 sessions, with D-number and reason — these are the highest-risk source of contradictions in today's work]
+
+### 🆕 Newly learned (only if non-empty)
+[Learned behaviours added since the last /start]
 
 ### Unactioned Comments
 [Any user comments not yet turned into decisions/tasks/changes]
@@ -215,6 +250,8 @@ Present a clear summary:
 
 ### Ready to proceed?
 ```
+
+The user does NOT want full decision/feature/learned-behaviour listings echoed back. The internal acknowledgement above is for YOU. Only surface items that genuinely need the user's attention (recent revisions, new tactical knowledge).
 
 ## Step 6: Wait
 

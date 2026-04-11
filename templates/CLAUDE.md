@@ -4,13 +4,26 @@
 
 ## CRITICAL: READ THESE FILES FIRST BEFORE ANY WORK
 
-1. **`SESSION_LOG.md`** — What happened in every previous session. READ THIS FIRST.
+0. **`RESUME_STATE.md`** — In-flight state from the last /save. Read FIRST. If `Clean save: false`, resume from the In-flight section before anything else.
+1. **`SESSION_LOG.md`** — What happened in every previous session. Historical narrative.
 2. **`TASK_REGISTRY.md`** — Every task ever created, with status. CHECK before creating new tasks. Column format: `| ID | Timestamp | Task | Status | Notes |`. IDs use `S{session}-{seq}` format. Status uses emoji: ✅ done, 🔄 in-progress, ⏳ pending, ❌ blocked, 🔁 re-queued.
-3. **`DECISIONS.md`** — Every architectural decision made. NEVER contradict these without explicit approval.
-4. **`FEATURE_LIST.json`** — All features with pass/fail status. The authoritative progress tracker.
-5. **`COMMENTS.md`** — User's verbatim comments from every session. SACRED — never lose these.
-6. **`plans/`** — Archived plans from every session. Read the last 3 in full to cross-reference with TASK_REGISTRY.
-7. **`audits/`** — Saved audit reports with timestamps. Read the latest to check project health.
+3. **`DECISIONS.md`** — Every architectural decision made. NEVER contradict these without explicit approval. Each entry has a `Category:` field (forever-active, active-constraint, feature-specific, superseded).
+4. **`LEARNED_BEHAVIOUR.md`** — Tactical knowledge: platform quirks, version gotchas, non-obvious workarounds. Prevents re-discovering the same bugs every session.
+5. **`FEATURE_LIST.json`** — QA tracker. `passes: true` means manually verified end-to-end, NOT just "task complete".
+6. **`COMMENTS.md`** — User's verbatim comments from every session. SACRED — never lose these.
+7. **`plans/`** — Archived plans from every session. Read the last 3 in full to cross-reference with TASK_REGISTRY.
+8. **`audits/`** — Saved audit reports with timestamps. Read the latest to check project health.
+
+## Custom Context Files
+
+Additional files `/start` should read at session start, declared per project. Add one line per file:
+
+- (none)
+
+Format: `- path/to/file.md — one-line purpose`
+Example: `- API_CONTRACTS.md — external API schemas the integration depends on`
+
+**Security note:** Credentials and secrets should use your platform's secret manager. Plain-text credential files in git are an anti-pattern — do not declare them here.
 
 ## SAFEGUARD FILE PAGINATION
 

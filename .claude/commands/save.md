@@ -42,6 +42,22 @@ Quickly review what has happened since the last checkpoint or session start:
 
 Check and update ALL of these:
 
+### RESUME_STATE.md
+- Overwrite this file with the current in-flight state. Fields:
+  ```
+  **Session:** S[N]
+  **Last updated:** YYYY-MM-DD HH:MM
+  **Clean save:** false
+
+  ## In-flight
+  [What is actively being worked on right now — approach, current state, next micro-step. Handoff note to the next agent.]
+
+  ## Next step
+  [User's stated intent in their own words]
+  ```
+- `Clean save: false` tells the next `/start` that work was mid-flight — it will surface this under `🔄 Resume from last session`.
+- SESSION_LOG.md remains the historical record; RESUME_STATE.md is the current-state slice.
+
 ### SESSION_LOG.md
 - If no entry exists for this session yet, create one
 - If an entry already exists, append a checkpoint marker:
@@ -56,7 +72,15 @@ Check and update ALL of these:
 
 ### TASK_REGISTRY.md
 - Log any new tasks created since the last save
+- **When creating new tasks:** add `Governed by: D-xx, D-yy` to the Notes column for any decisions that constrain the task's implementation. This makes constraints visible at the point of execution, not buried in DECISIONS.md.
 - Update status of tasks worked on (✅ done / ⏳ pending / 🔄 in-progress)
+- **When marking a task ✅ done:** amend its Notes column with:
+  - **Files:** 1–3 key paths touched
+  - **Approach:** one sentence — the pattern or library used
+  - **Governed by:** decision IDs that shaped the solution (if any)
+
+  Example: `Files: widgets/favourite.php, blocks/fav-block.js | Approach: ACF flexible content with REST cache | Governed by: D-055`
+  Keep it terse. This metadata is for future queries, not narrative.
 - Ensure no tasks are missing
 
 ### COMMENTS.md
@@ -65,9 +89,25 @@ Check and update ALL of these:
 
 ### DECISIONS.md
 - If any architectural decisions were made since the last save, log them
+- **Mandatory Category field** on every new entry. Assign one of: `forever-active`, `active-constraint`, `feature-specific`, `superseded`. If uncertain, default to `active-constraint` (safest — won't auto-archive).
+- If a decision supersedes an earlier one, mark the old one `Category: superseded` with a pointer to the new D-number.
+
+### LEARNED_BEHAVIOUR.md
+- If the session surfaced any non-obvious workaround, platform quirk, version-specific gotcha, or "spent >15 minutes debugging this" discovery, log it here.
+- Do NOT log ordinary coding knowledge; only things a fresh agent would re-discover the hard way.
+- Entry format:
+  ```
+  ## LB-NNN — [Short title] (Session N, YYYY-MM-DD)
+  **Context:** Where this surfaces (platform, plugin, version)
+  **Gotcha:** What fails and how
+  **Workaround:** What actually works
+  **Why:** Root cause if known
+  **Related:** Tasks/decisions (optional)
+  ```
 
 ### FEATURE_LIST.json
-- If any features changed status (passes: false → true), update them
+- **Semantics:** FEATURE_LIST is a QA tracker, NOT a task-completion mirror. Only flip `passes: true` when the user has **manually verified** the feature works end-to-end. Task completion is tracked in TASK_REGISTRY. Do not confuse the two.
+- If the user reports a feature broken, flip `passes: false` with a `notes` description of the failing case.
 
 ## Step 2.5: Rotate Safeguard Files (Pagination)
 
@@ -98,9 +138,20 @@ Check and update ALL of these:
 5. If no done tasks older than 5 sessions, nothing to archive — skip.
 
 ### DECISIONS.md
-1. Review each decision using your session context. Identify **actioned decisions** — those fully implemented and no longer actively constraining current work. Once the part of the build a decision relates to is complete and you've moved on, that decision is actioned.
-2. Move actioned decisions → `DECISIONS_pageN.md`.
-3. Keep all active/unactioned decisions in the main file.
+1. Review each decision's `Category:` field.
+2. Archive to `DECISIONS_pageN.md`:
+   - `superseded` → archive immediately
+   - `feature-specific` → archive if the governing feature is ✅ done AND no pending tasks reference it
+   - `active-constraint` → archive only if the governed system is permanently retired
+   - `forever-active` → **NEVER** archive, regardless of age
+3. If a decision has no `Category:` field, treat as `active-constraint` (safe default) and flag it for classification in your save report.
+4. Keep all non-archivable decisions in the main file.
+5. Add/update archive reference line.
+
+### LEARNED_BEHAVIOUR.md
+1. Review each entry. An entry is "actioned" only when the underlying platform/library has been removed or upgraded past the bug.
+2. Actioned entries → `LEARNED_BEHAVIOUR_pageN.md`.
+3. Active entries stay in the main file regardless of age — the knowledge is still load-bearing.
 4. Add/update archive reference line.
 
 ### COMMENTS.md
@@ -118,21 +169,25 @@ Check and update ALL of these:
 Before proceeding to git, confirm every safeguard file was addressed. Output this checklist:
 
 **Update verification:**
+- RESUME_STATE.md — [overwritten with current in-flight / work is between sub-tasks, snapshot captured]
 - SESSION_LOG.md — [updated / already current — reason]
 - TASK_REGISTRY.md — [N tasks added/updated / no task changes — reason]
 - COMMENTS.md — [N comments logged / no new comments this session]
-- DECISIONS.md — [N decisions logged / no new decisions — checked: no architecture choices, algorithm choices, UI patterns, data model changes, naming conventions, or approach reversals this session]
-- FEATURE_LIST.json — [N features updated / no feature status changes — checked: no features changed pass/fail, no new sub-features, no significant rework]
+- DECISIONS.md — [N decisions logged (all have Category field) / no new decisions — checked: no architecture choices, algorithm choices, UI patterns, data model changes, naming conventions, or approach reversals this session]
+- LEARNED_BEHAVIOUR.md — [N entries logged / no new tactical knowledge — checked: no gotchas, workarounds, or >15min debugs this session]
+- FEATURE_LIST.json — [N features verified / no QA updates — checked: user did not verify or report broken any features this session]
 
 **Decision trigger check:** Were ANY of these made this session?
   Architecture choices, algorithm/approach selections, UI/UX pattern decisions,
   data model changes, naming conventions, technology selections, approach reversals,
   workflow changes, configuration decisions.
-  If yes and DECISIONS.md wasn't updated → go back and update it now.
+  If yes and DECISIONS.md wasn't updated → go back and update it now. Every new decision MUST have a `Category:` field.
 
-**Feature trigger check:** Did ANY feature change status this session?
-  New features added, existing features passing/failing, sub-features created,
-  significant feature rework.
+**Learned behaviour trigger check:** Did the session surface any non-obvious workaround, platform quirk, version-specific gotcha, or ">15 minutes debugging this" discovery?
+  If yes and LEARNED_BEHAVIOUR.md wasn't updated → update it now.
+  Do NOT log ordinary coding knowledge; only things a fresh agent would re-discover the hard way.
+
+**Feature trigger check:** Did the user **manually verify** any feature working end-to-end this session, or report one broken? Task completion does NOT count — only human verification.
   If yes and FEATURE_LIST.json wasn't updated → go back and update it now.
 
 If any file shows 0 changes, the reason must be specific (not "no changes needed").
@@ -162,11 +217,13 @@ Present a brief confirmation — keep it concise, not a full report:
 ```
 ## Checkpoint Saved
 
+- RESUME_STATE.md — in-flight snapshot written (Clean save: false)
 - SESSION_LOG.md — [updated/no changes needed]
 - TASK_REGISTRY.md — [N tasks updated / no changes needed]
 - COMMENTS.md — [N comments added / no changes needed]
 - DECISIONS.md — [N decisions added / no changes needed]
-- FEATURE_LIST.json — [N features updated / no changes needed]
+- LEARNED_BEHAVIOUR.md — [N entries added / no changes needed]
+- FEATURE_LIST.json — [N features verified / no changes needed]
 - Git — [commit hash] pushed / no changes to commit
 
 Progress is saved. Continue working — run /save again any time, or /end to wrap up.
