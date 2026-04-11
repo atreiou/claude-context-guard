@@ -1,7 +1,5 @@
 ---
-name: start
-description: "Type /start at the beginning of every session. Reads all safeguard files, recovers context, cross-references plans against task registry, and summarises project state. On first run, sets up safeguard files from templates."
-disable-model-invocation: false
+description: "Type /start at the beginning of every session. Reads all safeguard files, recovers context, cross-references plans against task registry, and summarises project state."
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 ---
 

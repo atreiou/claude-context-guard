@@ -41,10 +41,10 @@ fi
 # end of 3.1
 
 # 3.2 Detect parent directory with .claude/ (working directory mismatch)
-# Claude Code looks for skills in its working directory's .claude/skills/.
+# Claude Code looks for slash commands in its working directory's .claude/commands/.
 # If the user opens Claude Code in a parent folder (e.g. /Software/) but
-# installs CCG into a subfolder (e.g. /Software/MyProject/), the skills
-# won't be found. Detect this and offer to install skills at the parent level.
+# installs CCG into a subfolder (e.g. /Software/MyProject/), the commands
+# won't be found. Detect this and offer to install commands at the parent level.
 PARENT_CLAUDE_DIR=""
 CHECK_DIR="$(dirname "$TARGET")"
 while [ "$CHECK_DIR" != "/" ] && [ "$CHECK_DIR" != "." ]; do
@@ -60,12 +60,12 @@ if [ -n "$PARENT_CLAUDE_DIR" ]; then
     echo "    $PARENT_CLAUDE_DIR/.claude/"
     echo ""
     echo "  If you open Claude Code from that parent directory, it will look"
-    echo "  for skills there — not in $TARGET/.claude/skills/."
-    echo "  CCG skills and hooks need to exist at the working directory level"
+    echo "  for commands there — not in $TARGET/.claude/commands/."
+    echo "  CCG commands and hooks need to exist at the working directory level"
     echo "  to be discovered by Claude Code."
     echo ""
     echo "  Options:"
-    echo "    1) Install skills and hooks to BOTH locations (recommended)"
+    echo "    1) Install commands and hooks to BOTH locations (recommended)"
     echo "    2) Install to target directory only (skip parent)"
     echo "    3) Abort"
     echo ""
@@ -90,15 +90,15 @@ fi
 # end of 3
 
 # 4. SECTION: File installation
-# 4.1 Copy skills
-# Copy skills
-echo "  Copying skills..."
-mkdir -p "$TARGET/.claude/skills"
-cp -r "$SCRIPT_DIR/.claude/skills/start" "$TARGET/.claude/skills/"
-cp -r "$SCRIPT_DIR/.claude/skills/end" "$TARGET/.claude/skills/"
-cp -r "$SCRIPT_DIR/.claude/skills/audit" "$TARGET/.claude/skills/"
-cp -r "$SCRIPT_DIR/.claude/skills/itemise" "$TARGET/.claude/skills/"
-cp -r "$SCRIPT_DIR/.claude/skills/save" "$TARGET/.claude/skills/"
+# 4.1 Copy slash commands
+# Copy commands
+echo "  Copying commands..."
+mkdir -p "$TARGET/.claude/commands"
+cp "$SCRIPT_DIR/.claude/commands/start.md" "$TARGET/.claude/commands/"
+cp "$SCRIPT_DIR/.claude/commands/end.md" "$TARGET/.claude/commands/"
+cp "$SCRIPT_DIR/.claude/commands/audit.md" "$TARGET/.claude/commands/"
+cp "$SCRIPT_DIR/.claude/commands/itemise.md" "$TARGET/.claude/commands/"
+cp "$SCRIPT_DIR/.claude/commands/save.md" "$TARGET/.claude/commands/"
 # end of 4.1
 
 # 4.2 Copy hooks
@@ -126,15 +126,15 @@ mkdir -p "$TARGET/templates"
 cp "$SCRIPT_DIR/templates/"* "$TARGET/templates/"
 # end of 4.4
 
-# 4.5 Copy skills and hooks to parent directory (if selected)
+# 4.5 Copy commands and hooks to parent directory (if selected)
 if [ "${INSTALL_TO_PARENT:-false}" = true ] && [ -n "$PARENT_CLAUDE_DIR" ]; then
-    echo "  Copying skills to parent: $PARENT_CLAUDE_DIR/.claude/skills/"
-    mkdir -p "$PARENT_CLAUDE_DIR/.claude/skills"
-    cp -r "$SCRIPT_DIR/.claude/skills/start" "$PARENT_CLAUDE_DIR/.claude/skills/"
-    cp -r "$SCRIPT_DIR/.claude/skills/end" "$PARENT_CLAUDE_DIR/.claude/skills/"
-    cp -r "$SCRIPT_DIR/.claude/skills/audit" "$PARENT_CLAUDE_DIR/.claude/skills/"
-    cp -r "$SCRIPT_DIR/.claude/skills/itemise" "$PARENT_CLAUDE_DIR/.claude/skills/"
-    cp -r "$SCRIPT_DIR/.claude/skills/save" "$PARENT_CLAUDE_DIR/.claude/skills/"
+    echo "  Copying commands to parent: $PARENT_CLAUDE_DIR/.claude/commands/"
+    mkdir -p "$PARENT_CLAUDE_DIR/.claude/commands"
+    cp "$SCRIPT_DIR/.claude/commands/start.md" "$PARENT_CLAUDE_DIR/.claude/commands/"
+    cp "$SCRIPT_DIR/.claude/commands/end.md" "$PARENT_CLAUDE_DIR/.claude/commands/"
+    cp "$SCRIPT_DIR/.claude/commands/audit.md" "$PARENT_CLAUDE_DIR/.claude/commands/"
+    cp "$SCRIPT_DIR/.claude/commands/itemise.md" "$PARENT_CLAUDE_DIR/.claude/commands/"
+    cp "$SCRIPT_DIR/.claude/commands/save.md" "$PARENT_CLAUDE_DIR/.claude/commands/"
 
     echo "  Copying hooks to parent: $PARENT_CLAUDE_DIR/.claude/hooks/"
     mkdir -p "$PARENT_CLAUDE_DIR/.claude/hooks"

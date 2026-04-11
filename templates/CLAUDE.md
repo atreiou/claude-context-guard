@@ -84,10 +84,6 @@ If the conversation is getting very long:
 
 After every significant block of work (completing a task, fixing a bug, making a decision, receiving user feedback), append to SESSION_LOG.md and update TASK_REGISTRY.md. The /end command is a CLEAN save — but incremental saves should happen throughout the session. The user can also run /save at any time to trigger an explicit mid-session checkpoint. If context is lost mid-session, the safeguard files should contain 90%+ of what happened. When saving, always capture: (1) what was done, (2) what is in flight right now, (3) what the user wants next, and (4) any errors hit and how they were resolved. These four elements make the difference between a useful handoff and a stale status update.
 
-## SLASH COMMAND ENFORCEMENT
-
-When the user types a message containing `/word` where `word` matches a skill name in `.claude/skills/`, you MUST invoke it via the Skill tool. NEVER manually replicate skill steps — skills exist because manual replication is error-prone and incomplete. A `UserPromptSubmit` hook will remind you, but you should not need the reminder.
-
 ## Project Overview
 
 **Project:** {PROJECT_NAME}

@@ -1,7 +1,5 @@
 ---
-name: audit
 description: "Type /audit to verify project integrity. Checks all safeguard files, git state, uncommitted work, plan cross-references, and task registry for completeness."
-disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Write
 ---
 

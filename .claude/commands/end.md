@@ -1,7 +1,5 @@
 ---
-name: end
 description: "Type /end to wrap up a session. Updates all safeguard files, commits uncommitted work, and ensures a clean handoff for the next session."
-disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 

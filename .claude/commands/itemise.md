@@ -1,7 +1,5 @@
 ---
-name: itemise
 description: "Type /itemise to number every section, function, and block in your code files so each part is referenceable by address. Creates backups before modifying, verifies integrity after, deletes backups on success."
-disable-model-invocation: false
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
