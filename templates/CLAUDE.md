@@ -129,6 +129,16 @@ After every approved plan is executed, archive it:
 2. Plans are cross-referenced by `/start` and `/audit` against the task registry
 3. **`~/.claude/plans/` is shared across all projects.** Only archive plans whose content references this project by name or file paths. Skip plans belonging to other projects.
 
+## Sync Discipline
+
+When syncing, migrating, relocating, or cleaning up files in any `.claude/` directory — whether CCG's files or a project's own:
+
+- **NEVER delete a directory wholesale.** No `rm -rf .claude/skills/`, no `rm -rf .claude/commands/`, no `rm -rf .claude/hooks/`, no matter what.
+- **Delete only the specific files you intend to remove, by name.** If a CCG migration retires five named skills, delete those five files — not the folder they lived in.
+- **If unsure whether a file is yours to touch, leave it alone and surface it to the user.** It's always cheaper to ask than to wipe someone's work.
+- **`.claude/` is a shared namespace.** Consumer projects can have their own hooks, skills, commands, and settings sitting right next to CCG's. They are not CCG's to remove.
+- This applies to every agent action — not just CCG sync. The same discipline applies to any cleanup or refactor pass that touches another project's files.
+
 ## Itemisation Protocol
 
 ITEMISATION: enabled
