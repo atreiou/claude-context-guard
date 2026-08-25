@@ -99,6 +99,7 @@ cp "$SCRIPT_DIR/.claude/commands/end.md" "$TARGET/.claude/commands/"
 cp "$SCRIPT_DIR/.claude/commands/audit.md" "$TARGET/.claude/commands/"
 cp "$SCRIPT_DIR/.claude/commands/itemise.md" "$TARGET/.claude/commands/"
 cp "$SCRIPT_DIR/.claude/commands/save.md" "$TARGET/.claude/commands/"
+cp "$SCRIPT_DIR/.claude/commands/lessons.md" "$TARGET/.claude/commands/"
 # end of 4.1
 
 # 4.2 Copy hooks
@@ -135,6 +136,7 @@ if [ "${INSTALL_TO_PARENT:-false}" = true ] && [ -n "$PARENT_CLAUDE_DIR" ]; then
     cp "$SCRIPT_DIR/.claude/commands/audit.md" "$PARENT_CLAUDE_DIR/.claude/commands/"
     cp "$SCRIPT_DIR/.claude/commands/itemise.md" "$PARENT_CLAUDE_DIR/.claude/commands/"
     cp "$SCRIPT_DIR/.claude/commands/save.md" "$PARENT_CLAUDE_DIR/.claude/commands/"
+    cp "$SCRIPT_DIR/.claude/commands/lessons.md" "$PARENT_CLAUDE_DIR/.claude/commands/"
 
     echo "  Copying hooks to parent: $PARENT_CLAUDE_DIR/.claude/hooks/"
     mkdir -p "$PARENT_CLAUDE_DIR/.claude/hooks"
