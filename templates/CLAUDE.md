@@ -25,9 +25,17 @@ Example: `- API_CONTRACTS.md — external API schemas the integration depends on
 
 **Security note:** Credentials and secrets should use your platform's secret manager. Plain-text credential files in git are an anti-pattern — do not declare them here.
 
-## SAFEGUARD FILE PAGINATION
+## LEDGER ROTATION — THE 5-SESSION RULE
 
-Safeguard files are automatically paginated by `/save` and `/end` every session — not just when they get large. SESSION_LOG and TASK_REGISTRY keep the last 5 sessions; older done tasks and session entries are archived into numbered page files (e.g. `SESSION_LOG_page1.md`, `TASK_REGISTRY_page2.md`). DECISIONS and COMMENTS archive anything that has been fully actioned. The main file always contains the most recent/active content. Archive pages are NOT auto-read by `/start` — they exist for reference when historical context is needed or when cross-referencing reveals gaps. Never delete archive pages.
+Every ledger's main file holds ONLY the last 5 sessions' content. Everything older is moved, verbatim, into numbered archive pages (`SESSION_LOG_page1.md`, `TASK_REGISTRY_page2.md`, and so on). Archive pages are append-only and are never deleted.
+
+`/end` runs the rotation every session. `/save` does not — it only rotates a file that has clearly overgrown the window, because re-running the whole pass on every mid-session checkpoint costs context and ages nothing.
+
+**DECISIONS and LEARNED_BEHAVIOUR keep a one-line index of everything they have archived.** When an entry is moved out, a line goes into the main file's `## Index of archived decisions` / `## Index of archived LBs` section giving its ID, title, category, and which page holds it. This is what makes the rotation safe: **archiving a decision does not revoke it.** A `forever-active` or `active-constraint` decision governs from the archive exactly as it did from the main file, and the index is how a future session finds it. Without the index, the only way to keep a binding rule discoverable was to never archive it — and the file grew until it swallowed the context window at every `/start`.
+
+**A pending task is never silently dropped by rotation.** A `⏳` row older than the window must be explicitly kept in a `## Live backlog` section, consolidated into another tracked item (annotated and archived), or archived with its deferral tag intact. Letting one vanish in a trim is a project failure.
+
+**`/start` does not read archive pages.** It reads the main files and the indexes. If an index line touches the work about to be done, the agent opens that one archive entry at that point — not at session start.
 
 ## DROPPING TASKS IS ABSOLUTELY UNACCEPTABLE
 

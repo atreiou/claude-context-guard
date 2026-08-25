@@ -1,5 +1,5 @@
 ---
-description: "Type /audit to verify project integrity. Checks all safeguard files, git state, uncommitted work, plan cross-references, and task registry for completeness."
+description: "Type /audit to verify project integrity. Checks all safeguard files, git state, uncommitted work, plan cross-references, archive index integrity, and the task registry."
 allowed-tools: Read, Grep, Glob, Bash, Write
 ---
 
@@ -13,6 +13,7 @@ Execute ALL checks below and report findings.
 
 Safeguard files may not be in the current working directory — they could be in a subdirectory. Find them first.
 
+0. **Check for a pointer file first:** if `CCG_LOCATION.md` exists at the working-directory root, it names CCG_ROOT directly. Trust it — skip the search below.
 1. **Check the working directory:** Try to read `CLAUDE.md` in the current directory.
 2. **If not found, search subdirectories:**
    ```bash
@@ -53,6 +54,20 @@ Safeguard files may not be in the current working directory — they could be in
 - Check for contradictions between decisions
 - **Classification sanity check:** flag any decision missing a `Category:` field. Valid values: `forever-active`, `active-constraint`, `feature-specific`, `superseded`. Report missing categories as **WARNING — needs classification**.
 - **Cross-reference check:** for any decision with an `Affects:` field listing task IDs, verify those tasks exist in TASK_REGISTRY (or its archives). Stale task references = **INFO — update Affects: field**.
+
+## 5.5 Archive Index Integrity
+
+Rotation moves decisions and learned behaviours out of the main files and leaves a one-line index entry behind. Those index lines are the ONLY way a future session finds an archived rule, so a missing line is a silently lost rule — exactly the failure this audit exists to catch.
+
+For DECISIONS and LEARNED_BEHAVIOUR:
+- Enumerate every entry ID in the `_page*.md` archives.
+- Enumerate every ID listed in the main file's `## Index of archived decisions` / `## Index of archived LBs`.
+- **In an archive but NOT in the index** = **CRITICAL — LOST RULE.** The entry exists but nothing points at it; no future session will ever find it. Report the ID, the page it is on, and its category.
+- **In the index but NOT in any archive** = **CRITICAL — BROKEN POINTER.** The index promises an entry that is not there. It was either deleted or never moved.
+- **Listed on the wrong page** = **WARNING — stale pointer.** The entry exists, but the index names a page it is not on.
+- **Duplicated** — the same ID in both the main file and an archive = **WARNING — double entry.** Two copies drift; say which is which.
+
+Also check that no ID is missing from the sequence across main file + all archives. A gap in `D-041, D-043` means D-042 was deleted rather than archived. Report as **CRITICAL — DELETED DECISION**.
 
 ## 6. Session Log
 - Read `SESSION_LOG.md`

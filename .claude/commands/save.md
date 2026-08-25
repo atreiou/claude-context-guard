@@ -5,7 +5,7 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 
 # Context Guard — Mid-Session Checkpoint (/save)
 
-The user wants to save current progress without ending the session. This is a lightweight checkpoint — no plan archiving, no session wrap-up. Update safeguard files, commit, push, and confirm.
+The user wants to save current progress without ending the session. This is a lightweight checkpoint — no plan archiving, no session wrap-up, no full ledger rotation. Update safeguard files, commit, push, and confirm.
 
 **Date convention:** all dates written by this skill use **dd/mm/yy** (UK format). Do not retroactively rewrite older dates already in safeguard files; only new entries follow this rule.
 
@@ -13,6 +13,7 @@ The user wants to save current progress without ending the session. This is a li
 
 Safeguard files may not be in the current working directory — they could be in a subdirectory. Find them first.
 
+0. **Check for a pointer file first:** if `CCG_LOCATION.md` exists at the working-directory root, it names CCG_ROOT directly. Trust it — skip the search below.
 1. **Check the working directory:** Try to read `CLAUDE.md` in the current directory.
 2. **If not found, search subdirectories:**
    ```bash
@@ -23,14 +24,17 @@ Safeguard files may not be in the current working directory — they could be in
 
 **All safeguard file paths in subsequent steps are relative to CCG_ROOT.** Git operations should also run from CCG_ROOT if it differs from the working directory.
 
-## Step 0.5: Verify Completeness
+## Step 0.5: Completeness Check — never opt for brevity
 
-Before saving, check what might be missing:
-- Are there any user comments from this session NOT yet in COMMENTS.md?
+Before saving, check what might be missing. Log anything missing BEFORE proceeding to Step 1.
+
+- Are there any user comments since the last save NOT yet in COMMENTS.md? They go in verbatim.
 - Are there any tasks worked on NOT yet updated in TASK_REGISTRY.md?
-- Review the recent conversation for any decisions made but not logged in DECISIONS.md
+- Review the recent conversation for any decisions made but not logged in DECISIONS.md.
+- Any gotcha, workaround, or debug that ate more than ~15 minutes → LEARNED_BEHAVIOUR.md.
+- **Did this session create or delete any credentials, accounts, or test fixtures?** If so, the FULL details — usernames, passwords, IDs, which are real identities and which are fixtures — must be written down in the project's designated record (see CLAUDE.md; commonly `docs/TEST_USERS.md`) **now**, in full. Not summarised, not "I'll remember it". A checkpoint that omits them has failed: the next session cannot log in and the work is blocked until someone recreates the information from scratch.
 
-If anything is missing, log it BEFORE proceeding to Step 1.
+Brevity is not a virtue here. Trimming a detail because it feels secondary is a decision to withhold information nobody authorised you to withhold.
 
 ## Step 1: Gather Current Context
 
@@ -111,60 +115,11 @@ Check and update ALL of these:
 - **Semantics:** FEATURE_LIST is a QA tracker, NOT a task-completion mirror. Only flip `passes: true` when the user has **manually verified** the feature works end-to-end. Task completion is tracked in TASK_REGISTRY. Do not confuse the two.
 - If the user reports a feature broken, flip `passes: false` with a `notes` description of the failing case.
 
-## Step 2.5: Rotate Safeguard Files (Pagination)
+## Step 2.5: Rotate Only If Overgrown
 
-**Always run this step.** You have full session context right now — use it to make smart archival decisions. Archive anything older than 5 sessions or fully actioned, regardless of file size. Don't wait for files to get large — keep them lean proactively.
+**Full ledger rotation is `/end`'s job, not `/save`'s.** A mid-session checkpoint should be cheap — re-running the whole pagination pass every time a user types `/save` burns context for no benefit, because nothing has aged since the last one.
 
-### SESSION_LOG.md
-1. Count `## Session` headers. Keep the **last 5 sessions** in the main file.
-2. Everything above the 5th-from-last `## Session` header → move to archive.
-3. Determine the next page number: check for existing `SESSION_LOG_page*.md` files. New page = highest existing + 1 (or 1 if none exist).
-4. Create `SESSION_LOG_pageN.md` with header:
-   ```
-   # SESSION_LOG — Archive Page N (Sessions X–Y)
-   # Current sessions: see SESSION_LOG.md
-   ---
-   [archived content]
-   ```
-5. Trim `SESSION_LOG.md`: keep the file header (lines before the first `## Session`) + the last 5 sessions.
-6. Add/update an archive reference line after the file header: `# 📁 Archives: SESSION_LOG_page1.md, SESSION_LOG_page2.md, ...`
-7. If 5 or fewer sessions exist, nothing to archive — skip.
-
-### TASK_REGISTRY.md
-1. Scan all task rows. Separate into:
-   - **Keep:** All non-done tasks (⏳ 🔄 ❌ 🔁) regardless of session + done tasks (✅) from the last 5 sessions
-   - **Archive:** Done tasks (✅) from sessions older than the last 5
-2. Create `TASK_REGISTRY_pageN.md` with archived done tasks, preserving their session headers.
-3. Trim the main file: keep file header + all non-done tasks + last 5 sessions of done tasks.
-4. Add/update archive reference line.
-5. If no done tasks older than 5 sessions, nothing to archive — skip.
-
-### DECISIONS.md
-1. Review each decision's `Category:` field.
-2. Archive to `DECISIONS_pageN.md`:
-   - `superseded` → archive immediately
-   - `feature-specific` → archive if the governing feature is ✅ done AND no pending tasks reference it
-   - `active-constraint` → archive only if the governed system is permanently retired
-   - `forever-active` → **NEVER** archive, regardless of age
-3. If a decision has no `Category:` field, treat as `active-constraint` (safe default) and flag it for classification in your save report.
-4. Keep all non-archivable decisions in the main file.
-5. Add/update archive reference line.
-
-### LEARNED_BEHAVIOUR.md
-1. Review each entry. An entry is "actioned" only when the underlying platform/library has been removed or upgraded past the bug.
-2. Actioned entries → `LEARNED_BEHAVIOUR_pageN.md`.
-3. Active entries stay in the main file regardless of age — the knowledge is still load-bearing.
-4. Add/update archive reference line.
-
-### COMMENTS.md
-1. Review each comment using your session context. Identify:
-   - **Actioned comments** — turned into decisions, tasks, or file changes
-   - **Curiosity questions** — exploratory/informational, not project directives
-2. Move both categories → `COMMENTS_pageN.md`.
-3. Keep all unactioned project directives in the main file.
-4. Add/update archive reference line.
-
-**FEATURE_LIST.json** — skip, stays compact.
+Do this instead: check whether any ledger's main file now holds MORE than the last 5 sessions' content. That normally only happens when the current session has just crossed a boundary, or when the previous `/end` was skipped. If one has overgrown, apply `/end` Step 2.5's rotation rules **to that file only**. Otherwise skip this step entirely and say nothing about it.
 
 ## Step 2.8: Verify Update Completion
 
@@ -205,10 +160,11 @@ Check CLAUDE.md "Version Control" section:
 After updating safeguard files, commit everything to git so the save point is durable:
 
 1. Run `git status` to see ALL modified and untracked files
-2. Stage safeguard files AND any approved code changes since the last commit
+2. Stage the safeguard files AND any approved code changes since the last commit — **by explicit path**.
+   **NEVER `git add -A` or `git add .`.** The working tree may be shared with other agents or with a paused lane of work, and a blanket stage sweeps their files into your commit. Name the paths you are committing. Anything you cannot attribute is left alone and surfaced to the user instead.
 3. Commit with a descriptive message: `"Checkpoint: [brief summary]"`
-4. Push to remote: `git push`
-5. If `git status` still shows uncommitted project files after the commit, something was missed — go back
+4. Push to remote: `git pull --rebase origin main && git push`
+5. If `git status` still shows uncommitted project files after the commit — excluding gitignored files and other agents' untracked lanes — something was missed. Go back.
 
 If there are no changes to commit (everything is already committed), skip this step.
 

@@ -16,6 +16,23 @@
 #
 # When a background agent fails (rate limit, timeout, etc.), its tasks MUST be re-logged as pending
 # When a session ends, ALL incomplete tasks MUST remain here with their current status
+#
+# ROTATION: done tasks older than the last 5 sessions archive to TASK_REGISTRY_page1.md, etc.
+# A PENDING row is NEVER silently dropped. One older than the window must be either kept in the
+# Live backlog below, consolidated into another tracked item (annotated `consolidated: <id>` and
+# archived), or archived with its deferral tag intact.
+#
+# 📁 Archives: (none yet)
+
+---
+
+## Live backlog
+
+Pending tasks that have outlived the 5-session window but are still genuinely actionable.
+They sit here so they stay visible without pretending to belong to a recent session.
+
+| ID | Timestamp | Task | Status | Notes |
+|----|-----------|------|--------|-------|
 
 ---
 

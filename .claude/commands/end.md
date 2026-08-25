@@ -1,5 +1,5 @@
 ---
-description: "Type /end to wrap up a session. Updates all safeguard files, commits uncommitted work, and ensures a clean handoff for the next session."
+description: "Type /end to wrap up a session. Updates all safeguard files, rotates anything older than 5 sessions into the archives, commits, and leaves a clean handoff."
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
@@ -15,6 +15,7 @@ The user wants to wrap up this session cleanly. Your job is to create a save poi
 
 Safeguard files may not be in the current working directory — they could be in a subdirectory. Find them first.
 
+0. **Check for a pointer file first:** if `CCG_LOCATION.md` exists at the working-directory root, it names CCG_ROOT directly. Trust it — skip the search below.
 1. **Check the working directory:** Try to read `CLAUDE.md` in the current directory.
 2. **If not found, search subdirectories:**
    ```bash
@@ -25,14 +26,17 @@ Safeguard files may not be in the current working directory — they could be in
 
 **All safeguard file paths in subsequent steps are relative to CCG_ROOT.** Git operations should also run from CCG_ROOT if it differs from the working directory.
 
-## Step 0.5: Verify Completeness Before Saving
+## Step 0.5: Completeness Check — never opt for brevity
 
-Before saving, verify nothing has been missed this session:
-- Are there any user comments from this session NOT yet in COMMENTS.md?
-- Are there any tasks worked on NOT yet updated in TASK_REGISTRY.md?
-- Review the conversation for any decisions made but not logged in DECISIONS.md
+Before saving, verify nothing from this session is missing. Log anything missing BEFORE proceeding to Step 1.
 
-If anything is missing, log it BEFORE proceeding to Step 1.
+- Every user comment from this session → COMMENTS.md, verbatim, timestamped.
+- Every task worked on → TASK_REGISTRY.md status updated.
+- Every decision made → DECISIONS.md, with its `Category:` field.
+- Every non-obvious gotcha, workaround, or >15-minute debug → LEARNED_BEHAVIOUR.md.
+- **Did this session create or delete any credentials, accounts, or test fixtures?** If so, the FULL details — usernames, passwords, IDs, which are real identities and which are fixtures — must be recorded in the project's designated record (see CLAUDE.md; commonly `docs/TEST_USERS.md`) **and** in the session log **before this session counts as cleanly saved**. Not summarised, not deferred. A save that omits them blocks the next session outright: it cannot log in, and the information has to be recreated from scratch.
+
+Brevity is not a virtue here. Trimming a detail because it feels secondary is a decision to withhold information nobody authorised you to withhold.
 
 ## Step 1: Gather Session Context
 
@@ -64,6 +68,7 @@ Check and update ALL of these:
   (Nothing pending.)
   ```
 - `Clean save: true` tells the next `/start` that the previous session ended cleanly — no mid-flight recovery needed. The next-session intent still lives in SESSION_LOG.md's "Next step" field.
+- **The "Next step" section is the next session's only plan pointer — make it precise.** `/start` no longer reads plan files, so whatever you write here is all the next agent gets. Name the exact task IDs, and if a plan governs the work, name the exact plan file *and the section within it* they should open. "Continue the migration" is useless. "Resume S12-004 at `plans/S11-002_auth-migration.md` §3 (session token rotation) — the schema change is done, the middleware is not" is a handoff.
 
 ### SESSION_LOG.md
 - Add an entry for this session (or update the existing one)
@@ -130,29 +135,44 @@ Check and update ALL of these:
 
 ### TASK_REGISTRY.md
 1. Scan all task rows. Separate into:
-   - **Keep:** All non-done tasks (⏳ 🔄 ❌ 🔁) regardless of session + done tasks (✅) from the last 5 sessions
+   - **Keep:** All non-done tasks (⏳ 🔄 ❌ 🔁) + done tasks (✅) from the last 5 sessions
    - **Archive:** Done tasks (✅) from sessions older than the last 5
 2. Create `TASK_REGISTRY_pageN.md` with archived done tasks, preserving their session headers.
 3. Trim the main file: keep file header + all non-done tasks + last 5 sessions of done tasks.
-4. Add/update archive reference line.
-5. If no done tasks older than 5 sessions, nothing to archive — skip.
+4. **A pending row older than the window is NEVER silently dropped.** Over time the main file accumulates stale ⏳ rows that are still, technically, pending. Each one must get an explicit disposition — pick one and record it:
+   - **Kept** — still genuinely actionable and owned by an agent. Move it into a `## Live backlog` section in the main file so it stays visible without pretending to belong to a recent session.
+   - **Consolidated** — the work is now covered by another tracked item. Annotate the row `consolidated: <id of the thing that covers it>` and archive it. That counts as tracked, not dropped.
+   - **Archived with its tag** — deferred or out-of-scope rows (post-MVP, deferred-to-user, blocked-on-third-party) keep their tag in the archive so a future search finds them.
+
+   Deleting the row, or letting it vanish in a trim, is a project failure. If you cannot classify a row, keep it and flag it in the Step 6 report.
+5. Add/update archive reference line.
+6. If no done tasks older than 5 sessions and no stale pending rows, nothing to archive — skip.
 
 ### DECISIONS.md
-1. Review each decision's `Category:` field.
-2. Archive to `DECISIONS_pageN.md`:
-   - `superseded` → archive immediately
-   - `feature-specific` → archive if the governing feature is ✅ done AND no pending tasks reference it
-   - `active-constraint` → archive only if the governed system is permanently retired
-   - `forever-active` → **NEVER** archive, regardless of age
-3. If a decision has no `Category:` field, treat as `active-constraint` (safe default) and flag it for classification in your end report.
-4. Keep all non-archivable decisions in the main file.
-5. Add/update archive reference line.
+
+Decisions rotate on the same 5-session window as everything else, but with one extra step that makes it safe: **the main file keeps a one-line index of every decision that has been archived.**
+
+1. Move decisions older than the last 5 sessions into `DECISIONS_pageN.md`, full text intact.
+2. For each one moved, add a line to the main file's `## Index of archived decisions` section:
+   `D-042 — Sigil images are WebP-only [active-constraint] → DECISIONS_page3.md`
+   ID, title, category, and which page holds it. Nothing more — the index has to stay cheap to read.
+3. If a decision has no `Category:` field, treat it as `active-constraint` (safe default) and flag it for classification in your end report.
+4. Mark `superseded` decisions as such (with a pointer to the D-number that replaced them) before archiving. They still archive — a superseded decision explains why the current one exists.
+5. Add/update the archive reference line.
+
+**Archiving does not revoke a decision.** `forever-active` and `active-constraint` decisions govern from the archive exactly as they did from the main file — the index is how future sessions find them. This is the whole reason the index exists: without it, the only way to keep a binding rule discoverable was to never archive it, and DECISIONS.md grew without limit until it swallowed the context window at every `/start`.
 
 ### LEARNED_BEHAVIOUR.md
-1. An entry is "actioned" only when the underlying platform/library has been removed or upgraded past the bug.
-2. Actioned entries → `LEARNED_BEHAVIOUR_pageN.md`.
-3. Active entries stay in the main file regardless of age.
-4. Add/update archive reference line.
+
+Same mechanism as decisions.
+
+1. Move entries older than the last 5 sessions into `LEARNED_BEHAVIOUR_pageN.md`, full text intact.
+2. For each one moved, add a line to the main file's `## Index of archived LBs` section:
+   `LB-017 — WPFC cache clear needs a fresh nonce → LEARNED_BEHAVIOUR_page2.md`
+3. An entry whose underlying platform or library has been removed, or upgraded past the bug, can be marked `resolved` in the index — it stays findable but no longer needs reading.
+4. Add/update the archive reference line.
+
+An archived learned behaviour is still true. The index line is what stops a future session re-discovering it the hard way.
 
 ### COMMENTS.md
 1. Review each comment using your session context. Identify:
@@ -213,20 +233,24 @@ Check CLAUDE.md "Version Control" section:
 - If mode is "local" → commit and tag only, no push
 - If mode is "remote" → commit, tag, push (default behaviour if no Version Control section exists)
 
+**Stage explicit paths only. NEVER `git add -A` or `git add .`.** The working tree may be shared with other agents or with a paused lane of work, and a blanket stage sweeps their files into your commit. Name every path you stage.
+
 1. Run `git status` to see ALL modified and untracked files
 2. For EVERY modified file shown, cross-reference with the conversation to confirm the changes were approved (any positive acknowledgement counts — "looks good", "cool", accepting and moving on, etc.):
-   - If approved this session → stage it
+   - If approved this session → stage it by name
    - If from a prior session (orphaned work) → check SESSION_LOG/TASK_REGISTRY for approval context. If the work was part of a completed task, stage it AND note in the commit message: "Includes orphaned work from S[N]"
    - If unapproved or unclear → ask the user before staging
+   - If it belongs to another agent's lane → leave it alone entirely and surface it in the report
    - If it should NOT be committed (temp files, diagnostics) → explicitly list it as excluded with reason
 3. For EVERY untracked file shown:
-   - If it's project code or safeguard files → stage it
+   - If it's project code or safeguard files you can attribute to this session → stage it by name
    - If it's a temp/diagnostic file → add to .gitignore or explicitly exclude with reason
+   - If you cannot attribute it → leave it, and say so
 4. Commit with a descriptive message
 5. Tag with the project's commit tagging convention
-6. Run `git status` AFTER committing — it MUST show "nothing to commit, working tree clean" (excluding gitignored files)
-7. If working tree is NOT clean after commit → something was missed, go back
-8. Push to remote (including tags)
+6. Run `git status` AFTER committing — it MUST show a clean tree, excluding gitignored files and any untracked lane you deliberately left alone
+7. If the tree is NOT clean for any other reason → something was missed, go back
+8. Push to remote: `git pull --rebase origin main && git push && git push --tags`. Rebasing first keeps a shared branch linear and surfaces a divergence as a conflict you resolve now, rather than as a merge commit nobody asked for or a rejected push at the end of a session.
 - **Backup remote (CCG only):** This step applies only to the Context Guard source-of-truth repo, which uses a dual-remote setup: `origin` (public) + `backup` (private dev). Most projects have a single `origin` remote — that IS their backup. If you're on a project with only `origin`, skip this step. Do NOT flag a missing `backup` remote as an issue.
   If a `backup` remote exists: `git checkout dev && git merge main --no-edit && git push backup dev && git checkout main`
 
