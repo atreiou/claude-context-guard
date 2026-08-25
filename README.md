@@ -14,15 +14,17 @@ This is a known issue. [Anthropic's own engineering team](https://www.anthropic.
 
 ## My Solution
 
-Context Guard creates a set of safeguard files that persist across sessions, plus five slash commands:
+Context Guard creates a set of safeguard files that persist across sessions, plus six slash commands:
 
-- **`/start`** — Type this at the start of every session. Claude reads all safeguard files, cross-references recent plans against the task registry, flags any dropped or unexplained tasks, detects and commits orphaned work from crashed sessions, and summarises the project state. Works from parent directories — automatically locates your project's Context Guard files in subdirectories. One command, full recovery.
+- **`/start`** — Type this at the start of every session. Claude reads your safeguard files, detects and commits orphaned work from crashed sessions, and summarises the project state. It reads the last five sessions' worth of content and nothing more: archives and plan files stay closed, so recovery costs a predictable, small number of tokens no matter how old the project is. Works from parent directories, automatically locating your project's Context Guard files in subdirectories. One command, full recovery.
 
 - **`/audit`** — Your personal safeguard. Call this at ANY moment to verify Claude's work. It runs a comprehensive integrity check across all files, plans, git state, and archived safeguard pages.
 
-- **`/save`** — Mid-session checkpoint. Saves all progress to safeguard files, commits, and pushes. Automatically paginates safeguard files that have grown too large — archiving older content to keep context lean for future sessions. Use during long sessions or any time you want an explicit save point.
+- **`/save`** — Mid-session checkpoint. Saves all progress to safeguard files, commits, and pushes, and writes an "in flight" handoff note so an interrupted session can be picked up mid-thought. Deliberately lightweight: it does not run the full archive rotation, because nothing has aged since the last one. Use during long sessions or any time you want an explicit save point.
 
-- **`/end`** — Optional session save point. When you're done for the day, type `/end` and Claude will update all safeguard files, paginate if needed, archive plans, commit, push (including to backup remotes if configured), and report a clean summary. Not required — `/start` handles recovery regardless — but useful when you want an explicit clean handoff.
+- **`/end`** — Optional session save point. When you're done for the day, type `/end` and Claude will update all safeguard files, rotate anything older than five sessions into the archives, archive plans, commit, push (including to backup remotes if configured), and report a clean summary. Not required, since `/start` handles recovery regardless, but useful when you want an explicit clean handoff.
+
+- **`/lessons`** — Optional end-of-session harvest. Most of what a debugging session learns is thrown away with the throwaway scripts that learned it. `/lessons` diffs this session's scratch scripts against each other, because the diff between version 2 and version 3 is a literal record of what the agent believed that turned out to be false, proposes each finding to you for approval, installs the approved ones as learned behaviours or helper functions, and only then clears the spent scripts away.
 
 - **`/itemise`** — Apply the Itemisation Protocol to your code files. Numbers sections, functions, and meaningful blocks so every part of the code is referenceable by address. Backs up files first, verifies nothing changed except the added numbers, then removes backups. Can be toggled off in `CLAUDE.md` for projects that don't want it.
 
@@ -64,7 +66,7 @@ From then on, `/start` reads your existing safeguard files and recovers full con
 | `COMMENTS.md` | Your verbatim comments logged as a safety net. Auto-paginated when large |
 | `FEATURE_LIST.json` | Pass/fail feature tracker (JSON — harder for LLMs to accidentally overwrite) |
 | `plans/` | Archived plans from every session, cross-referenced by /start and /audit |
-| `*_page*.md` | Auto-generated archive pages when safeguard files exceed 300 lines |
+| `*_page*.md` | Archive pages holding everything older than the last 5 sessions |
 
 ### What Gets Configured
 
@@ -72,8 +74,9 @@ From then on, `/start` reads your existing safeguard files and recovers full con
 |-----------|---------|
 | `/start` skill | Session recovery — one command to restore full context |
 | `/audit` skill | On-demand integrity check — verify Claude's work at any moment |
-| `/save` skill | Mid-session checkpoint — update safeguard files, commit, push, and paginate |
-| `/end` skill | Optional session save point — clean wrap-up with commit, push, and backup sync |
+| `/save` skill | Mid-session checkpoint — update safeguard files, write an in-flight handoff note, commit, push |
+| `/end` skill | Optional session save point — clean wrap-up with archive rotation, commit, push, backup sync |
+| `/lessons` skill | Turns a session's throwaway debug scripts into learned behaviours and helpers, then clears them |
 | `/itemise` skill | Itemisation Protocol — numbered code addressing with backup and integrity verification |
 | Pre-commit hook | Reminds Claude to update safeguard files before every git commit |
 | Pre-compaction hook | Automatically saves all progress before context compression — no data loss |
@@ -83,12 +86,11 @@ From then on, `/start` reads your existing safeguard files and recovers full con
 ### Session Start (`/start`)
 
 1. Locates Context Guard files — searches subdirectories up to 4 levels deep, so you can launch from a parent directory
-2. Reads all current safeguard files (paginated archives are noted but not loaded — keeping context lean)
+2. Reads the current safeguard files: the last five sessions of history, plus the one-line indexes of everything archived
 3. Checks git state — detects and commits orphaned work from crashed or overflowed sessions
-4. Reads the last 3 archived plans **in full**
-5. Cross-references every plan item against the task registry
-6. Flags dropped tasks (in plan but not in registry) and unexplained tasks (in registry but no source)
-7. Summarises everything and waits for your confirmation
+4. Summarises everything and waits for your confirmation
+
+**What `/start` deliberately does NOT read:** archive pages, and plan files. Both are expensive and rarely needed at the moment a session opens. The archive indexes tell Claude what exists, and `RESUME_STATE.md` names the exact plan file and section the first task needs, so the relevant material gets opened when the work starts rather than before it. The full plan-versus-registry sweep, which catches dropped and unexplained tasks across every plan and every archive, lives in `/audit` — where it reads *all* plans rather than a sample.
 
 ### On-Demand Audit (`/audit`)
 
@@ -104,7 +106,7 @@ Everything `/start` does, plus:
 When you're ready to stop working, type `/end`. Claude will:
 1. Review everything done this session
 2. Update all safeguard files (session log, task registry, comments, decisions, features)
-3. Paginate any safeguard files over 300 lines — archiving older content to keep future `/start` loads lean
+3. Rotate every ledger: anything older than the last five sessions moves into an archive page, leaving a one-line index entry behind
 4. Archive any unarchived plans
 5. Commit and push all changes (including backup remotes if configured)
 6. Verify clean git state
@@ -115,12 +117,13 @@ This is entirely optional — `/start` will recover context regardless. But `/en
 ### Mid-Session Checkpoint (`/save`)
 
 A durable save point you can run at any time during a session. Claude will:
-1. Check for any unlogged comments, tasks, or decisions
+1. Check for any unlogged comments, tasks, decisions, or credentials created this session
 2. Update all safeguard files with current progress
-3. Paginate any safeguard files over 300 lines — archiving older content automatically
-4. Add a checkpoint marker to the session log with an "in flight" handoff note
-5. Commit and push all changes
-6. Confirm what was saved
+3. Add a checkpoint marker to the session log with an "in flight" handoff note
+4. Commit and push all changes
+5. Confirm what was saved
+
+`/save` skips the archive rotation on purpose. Running the full pass on every checkpoint costs context and archives nothing new, because no content has aged since the last one. Rotation is `/end`'s job; `/save` only touches a ledger that has visibly overgrown its window.
 
 Use it when a session is running long, before a risky operation, or any time you want peace of mind.
 
@@ -194,23 +197,33 @@ This file is interwoven with auth.js. Edit one, edit the other (see CLAUDE.md �
 **Stale detection via `/audit`.** When a source file has been modified more recently than a sidecar row's `Last edit`, `/audit` surfaces the row under a `📝 Possibly stale index entries` block — as a *suggestion*, not an auto-fix. Hand-written descriptions are often still accurate even when the date is old; the human (or the next editing agent) owns the rewrite decision.
 
 
-### Safeguard File Pagination
+### Ledger Rotation — the 5-session rule
 
-As projects grow, safeguard files accumulate history that eats into the context window on every `/start`. Context Guard handles this automatically — when any safeguard file exceeds 300 lines, `/save` and `/end` archive older content into numbered page files:
+As projects grow, safeguard files accumulate history that eats into the context window on every `/start`. Context Guard bounds this: **every ledger's main file holds only the last five sessions' content.** Everything older moves, verbatim, into numbered archive pages (`SESSION_LOG_page1.md`, `TASK_REGISTRY_page2.md`, and so on), which are append-only and never deleted.
 
-- `SESSION_LOG_page1.md`, `SESSION_LOG_page2.md`, etc.
-- `TASK_REGISTRY_page1.md`, etc.
-
-Each file type has its own archival strategy:
+`/end` runs the rotation every session, using the full session context it has right there to make the archival calls well.
 
 | File | What stays in the main file | What gets archived |
 |------|---------------------------|-------------------|
-| SESSION_LOG | Last 3 sessions | Older session entries |
-| TASK_REGISTRY | All active tasks (pending/in-progress/blocked) + last 3 sessions of done tasks | Older completed tasks |
-| DECISIONS | Active/unactioned decisions | Fully implemented decisions |
+| SESSION_LOG | Last 5 sessions | Older session entries |
+| TASK_REGISTRY | All live tasks + last 5 sessions of done tasks | Older completed tasks, plus stale pending rows with an explicit disposition |
+| DECISIONS | Last 5 sessions of decisions, **plus a one-line index of every archived decision** | Older decisions, full text |
+| LEARNED_BEHAVIOUR | Last 5 sessions of entries, **plus a one-line index of every archived entry** | Older entries, full text |
 | COMMENTS | Unactioned project directives | Actioned comments and curiosity questions |
 
-Archives are never deleted — they're available for reference via `/audit` or when explicitly requested. `/start` notes their existence but doesn't read them, keeping context lean for actual work.
+**The archive index is what makes this safe.** When a decision is moved out, a single line stays behind in the main file giving its ID, title, category, and which page holds it:
+
+```
+D-042 — Sigil images are WebP-only [active-constraint] → DECISIONS_page3.md
+```
+
+**Archiving a decision does not revoke it.** A `forever-active` or `active-constraint` decision governs from the archive exactly as it did from the main file. The index is how a future session finds it: `/start` reads the index, and if a line touches the work about to be done, Claude opens that one archive entry at that point.
+
+Without the index, the only way to keep a binding rule discoverable was to never archive it, which meant DECISIONS.md grew without limit until it swallowed the context window at every session start. With it, the main file stays small and nothing stops applying.
+
+**Pending tasks are never silently dropped.** A `⏳` row that outlives the window has to be given an explicit disposition: kept in a `Live backlog` section, consolidated into another tracked item and annotated as such, or archived with its deferral tag intact. Letting one vanish in a trim is treated as a project failure, and `/audit` checks for exactly this.
+
+`/audit` also verifies index integrity in both directions: an entry sitting in an archive with no index line is a **lost rule**, and an index line pointing at an entry that is not there is a **broken pointer**. Both are reported as critical.
 
 ### Automatic Pre-Compaction Save
 
