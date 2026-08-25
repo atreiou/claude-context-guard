@@ -1,7 +1,7 @@
-# TASK_REGISTRY.md — {PROJECT_NAME} Permanent Task Log
+# TASK_REGISTRY.md: {PROJECT_NAME} Permanent Task Log
 # EVERY TASK EVER CREATED MUST BE LOGGED HERE WITH A TIMESTAMP
 # DROPPING TASKS IS ABSOLUTELY UNACCEPTABLE AND WILL RESULT IN PROJECT FAILURE
-# CHECK THIS FILE BEFORE CREATING NEW TASKS — DO NOT DUPLICATE
+# CHECK THIS FILE BEFORE CREATING NEW TASKS. DO NOT DUPLICATE
 #
 # Status: ✅ done | 🔄 in-progress | ⏳ pending | ❌ blocked | 🔁 re-queued (failed, needs retry)
 #
@@ -9,8 +9,8 @@
 # ID = S{session}-{seq} (e.g. S1-001, S2-003). Timestamp = YYYY-MM-DD.
 #
 # Notes may include:
-#   - `Governed by: D-xx, D-yy`  — decisions that constrain this task's implementation (strongly recommended for architectural work)
-#   - `Blocked on: T-zz`         — other tasks this depends on
+#   - `Governed by: D-xx, D-yy`  for decisions that constrain this task's implementation (strongly recommended for architectural work)
+#   - `Blocked on: T-zz`         for other tasks this depends on
 #   - On completion, amend with: `Files: path1, path2 | Approach: one-sentence pattern/library | Governed by: D-xx`
 #   This makes the archived registry a queryable knowledge base, not dead rows.
 #
@@ -36,7 +36,7 @@ They sit here so they stay visible without pretending to belong to a recent sess
 
 ---
 
-## Session 1 — {DATE}
+## Session 1 ({DATE})
 
 | ID | Timestamp | Task | Status | Notes |
 |----|-----------|------|--------|-------|

@@ -1,6 +1,6 @@
-# LEARNED_BEHAVIOUR.md — {PROJECT_NAME} Tactical Knowledge Log
+# LEARNED_BEHAVIOUR.md: {PROJECT_NAME} Tactical Knowledge Log
 # Non-obvious workarounds, platform quirks, version-specific gotchas, and hard-won discoveries.
-# This is the tactical equivalent of DECISIONS.md — for things a fresh agent would otherwise re-discover the hard way.
+# This is the tactical equivalent of DECISIONS.md, for things a fresh agent would otherwise re-discover the hard way.
 #
 # WHAT TO LOG:
 # - Platform/library gotchas that cost >15 minutes to debug
@@ -15,7 +15,7 @@
 #
 # ROTATION: entries older than the last 5 sessions move, full text intact, into
 # LEARNED_BEHAVIOUR_page1.md, etc. during /end. Each one leaves a one-line entry in the index
-# below. An archived entry is still true — the index line is what stops a future session
+# below. An archived entry is still true. The index line is what stops a future session
 # re-discovering it the hard way. Mark an entry `resolved` in the index once the underlying
 # platform or library has been removed or upgraded past the bug.
 #
@@ -26,14 +26,14 @@
 ## Index of archived LBs
 
 <!-- One line per archived entry. Format:
-     LB-001 — Short title → LEARNED_BEHAVIOUR_page1.md
+     LB-001: Short title → LEARNED_BEHAVIOUR_page1.md
      Add [resolved] where the underlying bug no longer exists. -->
 
 (Nothing archived yet.)
 
 ---
 
-## LB-001 — [Example entry — delete when real entries begin] (Session 0, YYYY-MM-DD)
+## LB-001: [Example entry, delete when real entries begin] (Session 0, YYYY-MM-DD)
 **Context:** Where this surfaces (platform, plugin, version)
 **Gotcha:** What fails and how (symptom)
 **Workaround:** What actually works

@@ -3,25 +3,25 @@ description: "Type /lessons at the end of a session to turn this session's throw
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
-# Context Guard — Lesson Harvest (/lessons)
+# Context Guard: Lesson Harvest (/lessons)
 
 Run at the END of a session, after `/save` or before `/end`.
 
-Most of what a session learns is thrown away. An agent writes a quick script to poke at something, it fails, the agent writes a second version, that fails differently, the third one works — and then all three are deleted or abandoned, taking with them the only record of what was actually wrong. **The diff between consecutive versions of a throwaway script is a literal record of what the agent believed that turned out to be false.** That is the most valuable thing a debugging session produces, and it is the thing that normally survives least.
+Most of what a session learns is thrown away. An agent writes a quick script to poke at something, it fails, the agent writes a second version, that fails differently, the third one works, and then all three are deleted or abandoned, taking with them the only record of what was actually wrong. **The diff between consecutive versions of a throwaway script is a literal record of what the agent believed that turned out to be false.** That is the most valuable thing a debugging session produces, and it is the thing that normally survives least.
 
 This skill mines that record, installs it where a future session will actually meet it, and only then clears the scripts away.
 
-**The governing principle: prefer a helper over prose.** A rule that must be remembered fails. A helper function that gets called, and a LEARNED_BEHAVIOUR entry that a future `/start` surfaces, do not. When a lesson can be expressed as code that makes the wrong answer impossible, write the code — a prose note saying "remember to escape the path" decays, a `safePath()` that escapes it cannot be forgotten.
+**The governing principle: prefer a helper over prose.** A rule that must be remembered fails. A helper function that gets called, and a LEARNED_BEHAVIOUR entry that a future `/start` surfaces, do not. When a lesson can be expressed as code that makes the wrong answer impossible, write the code. A prose note saying "remember to escape the path" decays, a `safePath()` that escapes it cannot be forgotten.
 
 ## Step 0: Locate CCG Root
 
-Same as `/start` Step 0 — check for a `CCG_LOCATION.md` pointer at the working-directory root first, otherwise find the `CLAUDE.md` that mentions `TASK_REGISTRY.md`.
+Same as `/start` Step 0: check for a `CCG_LOCATION.md` pointer at the working-directory root first, otherwise find the `CLAUDE.md` that mentions `TASK_REGISTRY.md`.
 
 ## Step 1: Collect THIS session's scripts only
 
 Find the scratch, driver, and debug scripts created or modified **this session**. Match on the session's own naming prefix if the project uses one, or on mtime since the session's first commit.
 
-**Never sweep the back catalogue.** A repo that has been running for months has hundreds of old scratch files. Mining them is a separate, explicitly authorised job — doing it here turns a five-minute wrap-up into an open-ended excavation and buries the session's actual lessons in noise.
+**Never sweep the back catalogue.** A repo that has been running for months has hundreds of old scratch files. Mining them is a separate, explicitly authorised job, and doing it here turns a five-minute wrap-up into an open-ended excavation and buries the session's actual lessons in noise.
 
 Group the files into series by name stem (`check_auth.js`, `check_auth2.js`, `check_auth_final.js` are one series). Usually the last file in a series is the result and the earlier ones are the path that got there. **The path is the valuable part.**
 
@@ -29,9 +29,9 @@ Group the files into series by name stem (`check_auth.js`, `check_auth2.js`, `ch
 
 A duplicate entry makes every future search noisier, so this step is not optional:
 
-1. `LEARNED_BEHAVIOUR.md` and its `## Index of archived LBs` — is this lesson already logged? If so, cite the LB number and move on.
-2. The project's helper library, if it has one — is this already a function? Same answer.
-3. `DECISIONS.md` and its index — a lesson that is really a decision belongs there instead, and may already be there.
+1. `LEARNED_BEHAVIOUR.md` and its `## Index of archived LBs`. Is this lesson already logged? If so, cite the LB number and move on.
+2. The project's helper library, if it has one. Is this already a function? Same answer.
+3. `DECISIONS.md` and its index. A lesson that is really a decision belongs there instead, and may already be there.
 
 **A session that finds nothing new says so.** That is a result, not a failure of the skill. Do not manufacture entries to justify the run.
 
@@ -39,7 +39,7 @@ A duplicate entry makes every future search noisier, so this step is not optiona
 
 For each consecutive pair of files in a series, answer one question: **what did the agent believe in file N that turned out to be wrong in file N+1?**
 
-Look for a changed selector, wait condition, endpoint, parameter name, assertion, path, encoding, or a guard that suddenly appeared. Ignore cosmetic churn — renamed variables and reformatting are not lessons.
+Look for a changed selector, wait condition, endpoint, parameter name, assertion, path, encoding, or a guard that suddenly appeared. Ignore cosmetic churn: renamed variables and reformatting are not lessons.
 
 ## Step 4: Classify each lesson
 
@@ -62,9 +62,9 @@ A proposed helper must be describable in **one sentence**. If it takes a paragra
 
 ## Step 6: Install what was approved
 
-- **LEARNED_BEHAVIOUR entries** — standard format (`## LB-NNN — title (Session N, dd/mm/yy)` with Context / Gotcha / Workaround / Why). Where a helper now enforces the lesson, add an `**Enforced by:**` line naming it — that tells a future reader the rule is already load-bearing in code and does not depend on them remembering it.
-- **Helpers** — add to the project's helper library, export it, and **self-test both ways**: prove it fails on a known-broken input and passes on a known-good one. A helper that has only ever been tested on the good case is a guess wearing a function signature.
-- **Decisions** — only where the lesson genuinely constrains future work, with a `Category:` field like any other decision.
+- **LEARNED_BEHAVIOUR entries**: standard format (`## LB-NNN: title (Session N, dd/mm/yy)` with Context / Gotcha / Workaround / Why). Where a helper now enforces the lesson, add an `**Enforced by:**` line naming it. That tells a future reader the rule is already load-bearing in code and does not depend on them remembering it.
+- **Helpers**: add to the project's helper library, export it, and **self-test both ways**: prove it fails on a known-broken input and passes on a known-good one. A helper that has only ever been tested on the good case is a guess wearing a function signature.
+- **Decisions**: only where the lesson genuinely constrains future work, with a `Category:` field like any other decision.
 
 ## Step 7: Only NOW, clear the scripts away
 

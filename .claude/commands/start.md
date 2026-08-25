@@ -3,25 +3,25 @@ description: "Type /start at the beginning of every session. Reads the safeguard
 allowed-tools: Read, Grep, Glob, Bash, Write, Edit
 ---
 
-# Context Guard — Session Recovery (/start)
+# Context Guard: Session Recovery (/start)
 
 You are starting or resuming a session. Follow these steps EXACTLY:
 
 **Date convention:** all dates written by this skill use **dd/mm/yy** (UK format). Do not retroactively rewrite older dates already in safeguard files; only new entries follow this rule.
 
-**Token discipline:** `/start` is a read-and-summarise operation, and every token it spends is a token the session's real work does not get. Read ONLY the files listed in Step 1. Do **NOT** read archive `_page*.md` files or plan files at session start — RESUME_STATE points at whatever the first task needs, and you open that material when you begin the task, not before.
+**Token discipline:** `/start` is a read-and-summarise operation, and every token it spends is a token the session's real work does not get. Read ONLY the files listed in Step 1. Do **NOT** read archive `_page*.md` files or plan files at session start. RESUME_STATE points at whatever the first task needs, and you open that material when you begin the task, not before.
 
 ## Step 0: Locate CCG Root
 
-Context Guard safeguard files may not be in the current working directory — they could be in a subdirectory (e.g. the working directory is a parent folder that contains the actual project). Find them before doing anything else.
+Context Guard safeguard files may not be in the current working directory; they could be in a subdirectory (e.g. the working directory is a parent folder that contains the actual project). Find them before doing anything else.
 
-0. **Check for a pointer file first:** if `CCG_LOCATION.md` exists at the working-directory root, it names CCG_ROOT directly. Trust it — skip the search below.
+0. **Check for a pointer file first:** if `CCG_LOCATION.md` exists at the working-directory root, it names CCG_ROOT directly. Trust it and skip the search below.
 1. **Check the working directory:** Try to read `CLAUDE.md` in the current directory.
 2. **If not found, search subdirectories:**
    ```bash
    find . -maxdepth 4 -name "CLAUDE.md" -type f 2>/dev/null | head -10
    ```
-3. **Filter results:** For each CLAUDE.md found, check if it contains `TASK_REGISTRY.md` (which confirms it's a Context Guard CLAUDE.md, not an unrelated file). Ignore any that contain the placeholder `{PROJECT_NAME}` — those are uninitialized templates.
+3. **Filter results:** For each CLAUDE.md found, check if it contains `TASK_REGISTRY.md` (which confirms it's a Context Guard CLAUDE.md, not an unrelated file). Ignore any that contain the placeholder `{PROJECT_NAME}`, since those are uninitialized templates.
 4. **Set CCG_ROOT:**
    - If exactly one valid CLAUDE.md is found → use its directory as CCG_ROOT
    - If multiple valid CLAUDE.md files are found → list them and ask the user which project to recover
@@ -32,8 +32,8 @@ Context Guard safeguard files may not be in the current working directory — th
 ## Step 0.5: First-Run Detection
 
 If Step 0 found a valid CLAUDE.md:
-- If it **contains the placeholder text `{PROJECT_NAME}`** — this is a **first run**. Go to the First-Run Setup below.
-- Otherwise — this is a normal session. Skip to Step 1.
+- If it **contains the placeholder text `{PROJECT_NAME}`**, this is a **first run**. Go to the First-Run Setup below.
+- Otherwise, this is a normal session. Skip to Step 1.
 
 ### First-Run Setup
 
@@ -68,9 +68,9 @@ If Step 0 found a valid CLAUDE.md:
 
    Ask:
    > "How would you like version control handled?"
-   > 1. **Local git + remote** — commit and push (most common)
-   > 2. **Local git only** — commit but never push
-   > 3. **No git** — skip all version control
+   > 1. **Local git + remote**: commit and push (most common)
+   > 2. **Local git only**: commit but never push
+   > 3. **No git**: skip all version control
 
    Based on their answer, update the `## Version Control` section in CLAUDE.md:
    - Option 1: set Mode to `remote`
@@ -80,7 +80,7 @@ If Step 0 found a valid CLAUDE.md:
 5. **Initialise SESSION_LOG.md:**
    - Add a Session 1 entry (date in dd/mm/yy):
    ```
-   ## Session 1 — [today's date in dd/mm/yy] (Project Setup)
+   ## Session 1 ([today's date in dd/mm/yy], Project Setup)
 
    **What happened:**
    - Project initialised with Context Guard
@@ -92,18 +92,18 @@ If Step 0 found a valid CLAUDE.md:
 
 6. **Report to the user:**
    ```
-   ## Context Guard — First-Run Setup Complete
+   ## Context Guard: First-Run Setup Complete
 
    ### Files Created
-   - CLAUDE.md — project instructions (auto-read every session)
-   - SESSION_LOG.md — session history
-   - TASK_REGISTRY.md — task tracker
-   - DECISIONS.md — architectural decisions register (with Category field)
-   - LEARNED_BEHAVIOUR.md — tactical knowledge / platform gotchas log
-   - COMMENTS.md — user comments log
-   - FEATURE_LIST.json — QA tracker (manually-verified features)
-   - RESUME_STATE.md — in-flight state for rate-limit / mid-task recovery
-   - plans/ — plan archive directory
+   - CLAUDE.md: project instructions (auto-read every session)
+   - SESSION_LOG.md: session history
+   - TASK_REGISTRY.md: task tracker
+   - DECISIONS.md: architectural decisions register (with Category field)
+   - LEARNED_BEHAVIOUR.md: tactical knowledge / platform gotchas log
+   - COMMENTS.md: user comments log
+   - FEATURE_LIST.json: QA tracker (manually-verified features)
+   - RESUME_STATE.md: in-flight state for rate-limit / mid-task recovery
+   - plans/: plan archive directory
 
    ### Next Steps
    - Type /start at the beginning of every session for full context recovery
@@ -114,30 +114,30 @@ If Step 0 found a valid CLAUDE.md:
    ### Would you like to run /itemise?
    The Itemisation Protocol adds numbered section markers to your code files,
    making every block referenceable by address (e.g. "check section 2.3.1").
-   It's optional — toggle it off in CLAUDE.md at any time.
+   It's optional; toggle it off in CLAUDE.md at any time.
    Type /itemise to run it now, or skip and come back to it later.
    ```
 
-7. **Stop here.** Do NOT continue to Step 1. The user is starting fresh — there are no previous sessions to recover from.
+7. **Stop here.** Do NOT continue to Step 1. The user is starting fresh, so there are no previous sessions to recover from.
 
 ---
 
 ## Step 1: Read Safeguard Files
 
-The ledgers are rotated: each main file holds ONLY the last 5 sessions' content (plus, for DECISIONS and LEARNED_BEHAVIOUR, a one-line index of everything archived). They are small by design — read each in full, in this order:
+The ledgers are rotated: each main file holds ONLY the last 5 sessions' content (plus, for DECISIONS and LEARNED_BEHAVIOUR, a one-line index of everything archived). They are small by design, so read each in full, in this order:
 
-0. **`RESUME_STATE.md` — READ THIS FIRST.** This file holds only the in-flight state from the last /save. If `Clean save: false`, the previous session was interrupted mid-task — the In-flight and Next step sections are your handoff note. Surface this in the Step 4 summary under a `🔄 Resume from last session` heading so the user knows you picked it up. If `Clean save: true`, the previous session ended cleanly and RESUME_STATE is empty — the next-session intent lives in SESSION_LOG's newest "Next step".
-1. `CLAUDE.md` — project rules and architecture. Parse the `## Custom Context Files` section for any project-specific files to load.
-2. `SESSION_LOG.md` — the last 5 sessions
-3. `TASK_REGISTRY.md` — live tasks, find the PENDING ones
-4. `DECISIONS.md` — recent decisions in full, **plus the `## Index of archived decisions`**. Never contradict these.
-5. `LEARNED_BEHAVIOUR.md` — recent entries in full, **plus the `## Index of archived LBs`** (if present — skip if not initialised yet)
-6. `COMMENTS.md` — user's verbatim comments, check for unactioned ones
-7. `FEATURE_LIST.json` — QA pass/fail tracker (manually-verified features, NOT task-completion mirror)
+0. **`RESUME_STATE.md`, READ THIS FIRST.** This file holds only the in-flight state from the last /save. If `Clean save: false`, the previous session was interrupted mid-task, and the In-flight and Next step sections are your handoff note. Surface this in the Step 4 summary under a `🔄 Resume from last session` heading so the user knows you picked it up. If `Clean save: true`, the previous session ended cleanly and RESUME_STATE is empty, so the next-session intent lives in SESSION_LOG's newest "Next step".
+1. `CLAUDE.md`: project rules and architecture. Parse the `## Custom Context Files` section for any project-specific files to load.
+2. `SESSION_LOG.md`: the last 5 sessions
+3. `TASK_REGISTRY.md`: live tasks, find the PENDING ones
+4. `DECISIONS.md`: recent decisions in full, **plus the `## Index of archived decisions`**. Never contradict these.
+5. `LEARNED_BEHAVIOUR.md`: recent entries in full, **plus the `## Index of archived LBs`** (if present; skip if not initialised yet)
+6. `COMMENTS.md`: user's verbatim comments, check for unactioned ones
+7. `FEATURE_LIST.json`: QA pass/fail tracker (manually-verified features, NOT task-completion mirror)
 
-**Archived entries are still binding.** A decision or learned behaviour that has been rotated into an archive page has NOT stopped applying — only its full text has moved. `forever-active` and `active-constraint` decisions govern from the archive exactly as they did from the main file. The one-line indexes in DECISIONS.md and LEARNED_BEHAVIOUR.md are how you find them: if an index line touches what you are about to work on, open its full text in the archive page **at that point**, not now.
+**Archived entries are still binding.** A decision or learned behaviour that has been rotated into an archive page has NOT stopped applying; only its full text has moved. `forever-active` and `active-constraint` decisions govern from the archive exactly as they did from the main file. The one-line indexes in DECISIONS.md and LEARNED_BEHAVIOUR.md are how you find them: if an index line touches what you are about to work on, open its full text in the archive page **at that point**, not now.
 
-**Custom context files:** After reading `CLAUDE.md`, scan its `## Custom Context Files` section. For every declared entry (lines matching `- path/to/file.md — purpose`), read the referenced file. Skip any that don't exist — don't fail the startup. Skip anything the section marks read-on-demand.
+**Custom context files:** After reading `CLAUDE.md`, scan its `## Custom Context Files` section. For every declared entry (lines matching `- path/to/file.md: purpose`), read the referenced file. Skip any that don't exist, and don't fail the startup. Skip anything the section marks read-on-demand.
 
 **Do NOT read at session start:** archive `_page*.md` files wholesale, or any file in `plans/`. Note that archive pages exist; open a specific entry only when the work needs it, per the binding rule above.
 
@@ -157,7 +157,7 @@ After checking git state, detect potential orphaned work:
 
 > ⚠️ **ORPHANED SESSION DETECTED**
 > Last session logged: S[N] on [date]
-> Last git commit: [hash] on [date] — "[message]"
+> Last git commit: [hash] on [date], "[message]"
 > Work was done after the last logged session. This may mean a session ended without /end.
 > Recommend: Review git log and reconstruct the missing session entry.
 
@@ -173,17 +173,17 @@ Check CLAUDE.md "Version Control" section:
 If Step 2 found **uncommitted changes** (modified or untracked files), a previous session likely ended without `/end` (context overflow, rate limit, crash). This work must be committed before proceeding.
 
 1. **Run `git status`** to see all uncommitted and untracked files
-2. **Review the changes** — run `git diff` and `git diff --cached` to understand what was done
-3. **Cross-reference with TASK_REGISTRY.md and SESSION_LOG.md** — identify which session produced these changes, what tasks they relate to, and confirm the work was approved (completed tasks, user-acknowledged output, etc.)
+2. **Review the changes** by running `git diff` and `git diff --cached` to understand what was done
+3. **Cross-reference with TASK_REGISTRY.md and SESSION_LOG.md** to identify which session produced these changes, what tasks they relate to, and confirm the work was approved (completed tasks, user-acknowledged output, etc.)
 4. **Stage and commit** with a descriptive message summarising the orphaned work:
    ```
    git add [explicit paths]
-   git commit -m "Recover uncommitted work from session [N] — [brief summary]"
+   git commit -m "Recover uncommitted work from session [N]: [brief summary]"
    ```
-   **NEVER `git add -A` or `git add .`.** The working tree may be shared with other agents or with a paused lane of work. Stage the specific paths you have attributed and nothing else — leave files you cannot attribute untouched and surface them to the user instead.
+   **NEVER `git add -A` or `git add .`.** The working tree may be shared with other agents or with a paused lane of work. Stage the specific paths you have attributed and nothing else. Leave files you cannot attribute untouched and surface them to the user instead.
 5. **Push** to remote: `git pull --rebase origin main && git push`
 6. **Report** what was committed:
-   > ✅ **Orphaned work committed:** [commit hash] — [summary of what was recovered]
+   > ✅ **Orphaned work committed:** [commit hash], [summary of what was recovered]
 
 If there are **unpushed commits** (committed but not pushed), push them now: `git pull --rebase origin main && git push && git push --tags`
 
@@ -195,32 +195,32 @@ If the working tree is clean and all commits are pushed, skip this step.
 
 The new session number = last session in SESSION_LOG.md + 1.
 
-**Plan cross-referencing is NOT done here.** Reading plan files at session start costs thousands of tokens for a check that is only occasionally needed, and RESUME_STATE's "Next step" already names the exact plan file and section the first task requires. The full plan-versus-registry sweep — including DROPPED TASK detection across every plan and every archive page — lives in `/audit` §3, which reads ALL plans rather than a sample. Run `/audit` when you want that check; do not reproduce it here.
+**Plan cross-referencing is NOT done here.** Reading plan files at session start costs thousands of tokens for a check that is only occasionally needed, and RESUME_STATE's "Next step" already names the exact plan file and section the first task requires. The full plan-versus-registry sweep, including DROPPED TASK detection across every plan and every archive page, lives in `/audit` §3, which reads ALL plans rather than a sample. Run `/audit` when you want that check; do not reproduce it here.
 
 ## Step 4: Summarise
 
 ### Internal context acknowledgement (do NOT output to user)
 
-Silently complete this checklist before composing the user summary. This is a self-check to confirm you absorbed the context — the output goes into your own working memory, not the chat:
+Silently complete this checklist before composing the user summary. This is a self-check to confirm you absorbed the context, and the output goes into your own working memory, not the chat:
 
 - Active decisions loaded: [N] (most recent: D-xx from S[yy])
-- Forever-active rules: [N] (brief mental list — style, brand, philosophy)
+- Forever-active rules: [N] (brief mental list: style, brand, philosophy)
 - Feature QA status: [X passing / Y failing / Z untested]
 - Learned behaviours loaded: [N entries]
-- Archived-entry indexes scanned: [N archived decisions, N archived LBs — any line that touches today's likely work]
+- Archived-entry indexes scanned: [N archived decisions, N archived LBs, plus any line that touches today's likely work]
 - Custom context files loaded: [list from CLAUDE.md Custom Context Files section]
 - Decisions revised in the last 3 sessions: [list, or "none"]
 - New learned behaviours since last /start: [list, or "none"]
-- Resume state: [Clean / Interrupted — resume from RESUME_STATE.md]
+- Resume state: [Clean / Interrupted, resume from RESUME_STATE.md]
 
-Any non-empty recent item → surface in the user summary below. Otherwise stay silent on it — no "None" placeholders, that's noise.
+Any non-empty recent item → surface in the user summary below. Otherwise stay silent on it. No "None" placeholders, that's noise.
 
 ### User-visible summary
 
-Present a clear summary. Only include sections that have content — omit empty ones.
+Present a clear summary. Only include sections that have content, and omit empty ones.
 
 ```
-## Session [N] — Context Recovery
+## Session [N]: Context Recovery
 
 ### 🔄 Resume from last session (only if RESUME_STATE.md Clean save: false)
 [Prepend the In-flight and Next step content verbatim from RESUME_STATE.md]
@@ -232,7 +232,7 @@ Present a clear summary. Only include sections that have content — omit empty 
 [List from TASK_REGISTRY with pending status]
 
 ### ⚠️ Recently revised (only if non-empty)
-[Decisions revised in the last 3 sessions, with D-number and reason — these are the highest-risk source of contradictions in today's work]
+[Decisions revised in the last 3 sessions, with D-number and reason. These are the highest-risk source of contradictions in today's work]
 
 ### 🆕 Newly learned (only if non-empty)
 [Learned behaviours added since the last /start]

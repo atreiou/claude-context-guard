@@ -1,18 +1,18 @@
-# CLAUDE.md — {PROJECT_NAME} Project Instructions
+# CLAUDE.md: {PROJECT_NAME} Project Instructions
 # This file is auto-read by Claude Code at every session start.
 # Last updated: {DATE}
 
 ## CRITICAL: READ THESE FILES FIRST BEFORE ANY WORK
 
-0. **`RESUME_STATE.md`** — In-flight state from the last /save. Read FIRST. If `Clean save: false`, resume from the In-flight section before anything else.
-1. **`SESSION_LOG.md`** — What happened in every previous session. Historical narrative.
-2. **`TASK_REGISTRY.md`** — Every task ever created, with status. CHECK before creating new tasks. Column format: `| ID | Timestamp | Task | Status | Notes |`. IDs use `S{session}-{seq}` format. Status uses emoji: ✅ done, 🔄 in-progress, ⏳ pending, ❌ blocked, 🔁 re-queued.
-3. **`DECISIONS.md`** — Every architectural decision made. NEVER contradict these without explicit approval. Each entry has a `Category:` field (forever-active, active-constraint, feature-specific, superseded).
-4. **`LEARNED_BEHAVIOUR.md`** — Tactical knowledge: platform quirks, version gotchas, non-obvious workarounds. Prevents re-discovering the same bugs every session.
-5. **`FEATURE_LIST.json`** — QA tracker. `passes: true` means manually verified end-to-end, NOT just "task complete".
-6. **`COMMENTS.md`** — User's verbatim comments from every session. SACRED — never lose these.
-7. **`plans/`** — Archived plans from every session. Read the last 3 in full to cross-reference with TASK_REGISTRY.
-8. **`audits/`** — Saved audit reports with timestamps. Read the latest to check project health.
+0. **`RESUME_STATE.md`**: In-flight state from the last /save. Read FIRST. If `Clean save: false`, resume from the In-flight section before anything else.
+1. **`SESSION_LOG.md`**: What happened in every previous session. Historical narrative.
+2. **`TASK_REGISTRY.md`**: Every task ever created, with status. CHECK before creating new tasks. Column format: `| ID | Timestamp | Task | Status | Notes |`. IDs use `S{session}-{seq}` format. Status uses emoji: ✅ done, 🔄 in-progress, ⏳ pending, ❌ blocked, 🔁 re-queued.
+3. **`DECISIONS.md`**: Every architectural decision made. NEVER contradict these without explicit approval. Each entry has a `Category:` field (forever-active, active-constraint, feature-specific, superseded).
+4. **`LEARNED_BEHAVIOUR.md`** holds tactical knowledge: platform quirks, version gotchas, non-obvious workarounds. Prevents re-discovering the same bugs every session.
+5. **`FEATURE_LIST.json`**: QA tracker. `passes: true` means manually verified end-to-end, NOT just "task complete".
+6. **`COMMENTS.md`**: User's verbatim comments from every session. SACRED. Never lose these.
+7. **`plans/`**: Archived plans from every session. Read the last 3 in full to cross-reference with TASK_REGISTRY.
+8. **`audits/`**: Saved audit reports with timestamps. Read the latest to check project health.
 
 ## Custom Context Files
 
@@ -20,22 +20,22 @@ Additional files `/start` should read at session start, declared per project. Ad
 
 - (none)
 
-Format: `- path/to/file.md — one-line purpose`
-Example: `- API_CONTRACTS.md — external API schemas the integration depends on`
+Format: `- path/to/file.md: one-line purpose`
+Example: `- API_CONTRACTS.md: external API schemas the integration depends on`
 
-**Security note:** Credentials and secrets should use your platform's secret manager. Plain-text credential files in git are an anti-pattern — do not declare them here.
+**Security note:** Credentials and secrets should use your platform's secret manager. Plain-text credential files in git are an anti-pattern, so do not declare them here.
 
-## LEDGER ROTATION — THE 5-SESSION RULE
+## LEDGER ROTATION: THE 5-SESSION RULE
 
 Every ledger's main file holds ONLY the last 5 sessions' content. Everything older is moved, verbatim, into numbered archive pages (`SESSION_LOG_page1.md`, `TASK_REGISTRY_page2.md`, and so on). Archive pages are append-only and are never deleted.
 
-`/end` runs the rotation every session. `/save` does not — it only rotates a file that has clearly overgrown the window, because re-running the whole pass on every mid-session checkpoint costs context and ages nothing.
+`/end` runs the rotation every session. `/save` does not; it only rotates a file that has clearly overgrown the window, because re-running the whole pass on every mid-session checkpoint costs context and ages nothing.
 
-**DECISIONS and LEARNED_BEHAVIOUR keep a one-line index of everything they have archived.** When an entry is moved out, a line goes into the main file's `## Index of archived decisions` / `## Index of archived LBs` section giving its ID, title, category, and which page holds it. This is what makes the rotation safe: **archiving a decision does not revoke it.** A `forever-active` or `active-constraint` decision governs from the archive exactly as it did from the main file, and the index is how a future session finds it. Without the index, the only way to keep a binding rule discoverable was to never archive it — and the file grew until it swallowed the context window at every `/start`.
+**DECISIONS and LEARNED_BEHAVIOUR keep a one-line index of everything they have archived.** When an entry is moved out, a line goes into the main file's `## Index of archived decisions` / `## Index of archived LBs` section giving its ID, title, category, and which page holds it. This is what makes the rotation safe: **archiving a decision does not revoke it.** A `forever-active` or `active-constraint` decision governs from the archive exactly as it did from the main file, and the index is how a future session finds it. Without the index, the only way to keep a binding rule discoverable was to never archive it, and the file grew until it swallowed the context window at every `/start`.
 
 **A pending task is never silently dropped by rotation.** A `⏳` row older than the window must be explicitly kept in a `## Live backlog` section, consolidated into another tracked item (annotated and archived), or archived with its deferral tag intact. Letting one vanish in a trim is a project failure.
 
-**`/start` does not read archive pages.** It reads the main files and the indexes. If an index line touches the work about to be done, the agent opens that one archive entry at that point — not at session start.
+**`/start` does not read archive pages.** It reads the main files and the indexes. If an index line touches the work about to be done, the agent opens that one archive entry at that point, not at session start.
 
 ## DROPPING TASKS IS ABSOLUTELY UNACCEPTABLE
 
@@ -43,9 +43,9 @@ Dropping tasks will result in the **complete failure of this project**. Every ta
 
 Before ending any session or hitting context limits, UPDATE the session log and task registry.
 
-## PRESERVE USER COMMENTS — MANDATORY
+## PRESERVE USER COMMENTS: MANDATORY
 
-Every comment the user makes in conversation MUST be logged verbatim in `COMMENTS.md` with timestamp and session ID. This includes directions, feedback, decisions, preferences, corrections — everything. Failure to preserve comments is as dangerous to the project as deleting core files. Comments can be removed once actioned (turned into decisions, tasks, or file changes).
+Every comment the user makes in conversation MUST be logged verbatim in `COMMENTS.md` with timestamp and session ID. This includes directions, feedback, decisions, preferences, corrections, and anything else they say. Failure to preserve comments is as dangerous to the project as deleting core files. Comments can be removed once actioned (turned into decisions, tasks, or file changes).
 
 ## USER AUDITS YOUR WORK
 
@@ -61,11 +61,11 @@ Update safeguard files (SESSION_LOG.md, TASK_REGISTRY.md, COMMENTS.md) IMMEDIATE
 - When conversation is getting very long (approaching context limits)
 - Or when the user runs `/save` to manually trigger a checkpoint
 
-Do NOT wait for /end. Treat safeguard files as a running log, updated incrementally. When saving, capture not just what was completed but what is **in flight** — the current approach, state, and next micro-step. If context is lost, this is the handoff note.
+Do NOT wait for /end. Treat safeguard files as a running log, updated incrementally. When saving, capture not just what was completed but what is **in flight**: the current approach, state, and next micro-step. If context is lost, this is the handoff note.
 
 ## INCREMENTAL COMMIT PROTOCOL
 
-When a block of work is completed and the user has approved it, commit immediately — do not wait for /end. Approval includes any positive acknowledgement: "looks good", "nice", "cool, let's move on", "yes", accepting the output and giving a new instruction, etc. Explicit "please commit" is NOT required.
+When a block of work is completed and the user has approved it, commit immediately. Do not wait for /end. Approval includes any positive acknowledgement: "looks good", "nice", "cool, let's move on", "yes", accepting the output and giving a new instruction, etc. Explicit "please commit" is NOT required.
 
 Before committing, verify:
 1. The changes match what was discussed and approved in the conversation
@@ -82,17 +82,17 @@ If a session has multiple user-approved task completions but zero commits, somet
 
 ## AUTOMATIC PRE-COMPACTION SAVE
 
-A PreCompact hook automatically backs up all safeguard files before Claude Code compresses the conversation. Copies are saved to `compaction-backups/YYYY-MM-DD_HHMMSS/`. This is a safety net — if context is lost and safeguard files weren't fully up to date, the backup preserves the last known state. The hook runs automatically; no action is needed from you or the user.
+A PreCompact hook automatically backs up all safeguard files before Claude Code compresses the conversation. Copies are saved to `compaction-backups/YYYY-MM-DD_HHMMSS/`. This is a safety net: if context is lost and safeguard files weren't fully up to date, the backup preserves the last known state. The hook runs automatically; no action is needed from you or the user.
 
 For best results, also follow the AUTO-CHECKPOINT PROTOCOL above to keep safeguard files current throughout the session.
 
 ## RATE LIMIT AWARENESS
 
-Rate limits pause the session but do NOT trigger compaction — context stays intact while waiting. The danger is when a rate limit hits **mid-operation** (e.g. halfway through a multi-file sync or large refactor). When the session resumes, you may lose track of which steps were completed. To protect against this:
+Rate limits pause the session but do NOT trigger compaction; context stays intact while waiting. The danger is when a rate limit hits **mid-operation** (e.g. halfway through a multi-file sync or large refactor). When the session resumes, you may lose track of which steps were completed. To protect against this:
 
 1. **Before any multi-step operation** (syncing to multiple repos, batch edits, large refactors), update safeguard files FIRST
 2. **After resuming from a rate limit**, re-read TASK_REGISTRY.md and SESSION_LOG.md to confirm where you left off
-3. **Mark tasks as done individually** as you complete them, not in a batch at the end — a rate limit between step 3 and step 7 of a plan should not lose the record of steps 1-3
+3. **Mark tasks as done individually** as you complete them, not in a batch at the end. A rate limit between step 3 and step 7 of a plan should not lose the record of steps 1 to 3
 
 ## CONTEXT OVERFLOW PROTOCOL
 
@@ -103,7 +103,7 @@ If the conversation is getting very long:
 
 ## SAVE FREQUENCY
 
-After every significant block of work (completing a task, fixing a bug, making a decision, receiving user feedback), append to SESSION_LOG.md and update TASK_REGISTRY.md. The /end command is a CLEAN save — but incremental saves should happen throughout the session. The user can also run /save at any time to trigger an explicit mid-session checkpoint. If context is lost mid-session, the safeguard files should contain 90%+ of what happened. When saving, always capture: (1) what was done, (2) what is in flight right now, (3) what the user wants next, and (4) any errors hit and how they were resolved. These four elements make the difference between a useful handoff and a stale status update.
+After every significant block of work (completing a task, fixing a bug, making a decision, receiving user feedback), append to SESSION_LOG.md and update TASK_REGISTRY.md. The /end command is a CLEAN save, but incremental saves should happen throughout the session. The user can also run /save at any time to trigger an explicit mid-session checkpoint. If context is lost mid-session, the safeguard files should contain 90%+ of what happened. When saving, always capture: (1) what was done, (2) what is in flight right now, (3) what the user wants next, and (4) any errors hit and how they were resolved. These four elements make the difference between a useful handoff and a stale status update.
 
 ## Project Overview
 
@@ -126,9 +126,9 @@ After every significant block of work (completing a task, fixing a bug, making a
 - **Branch:** main
 
 Skills read this section to determine git behaviour:
-- `remote` — commit + push + tags (default)
-- `local` — commit + tags only, no push
-- `none` — skip all git steps in /start, /save, /end, /audit
+- `remote`: commit + push + tags (default)
+- `local`: commit + tags only, no push
+- `none`: skip all git steps in /start, /save, /end, /audit
 
 ## Plan Archiving
 
@@ -139,13 +139,13 @@ After every approved plan is executed, archive it:
 
 ## Sync Discipline
 
-When syncing, migrating, relocating, or cleaning up files in any `.claude/` directory — whether CCG's files or a project's own:
+When syncing, migrating, relocating, or cleaning up files in any `.claude/` directory, whether CCG's files or a project's own:
 
 - **NEVER delete a directory wholesale.** No `rm -rf .claude/skills/`, no `rm -rf .claude/commands/`, no `rm -rf .claude/hooks/`, no matter what.
-- **Delete only the specific files you intend to remove, by name.** If a CCG migration retires five named skills, delete those five files — not the folder they lived in.
+- **Delete only the specific files you intend to remove, by name.** If a CCG migration retires five named skills, delete those five files, not the folder they lived in.
 - **If unsure whether a file is yours to touch, leave it alone and surface it to the user.** It's always cheaper to ask than to wipe someone's work.
 - **`.claude/` is a shared namespace.** Consumer projects can have their own hooks, skills, commands, and settings sitting right next to CCG's. They are not CCG's to remove.
-- This applies to every agent action — not just CCG sync. The same discipline applies to any cleanup or refactor pass that touches another project's files.
+- This applies to every agent action, not just CCG sync. The same discipline applies to any cleanup or refactor pass that touches another project's files.
 
 
 ## Description Ruleset
@@ -154,16 +154,16 @@ Sidecar `.index.md` descriptions (one row per numbered section in a code file) f
 
 - Active voice, present tense
 - States the **job**, not the implementation. Good: `validates email format`. Bad: `uses regex on email`.
-- Function-name prefix where applicable: `parseInput() — validates form data and trims whitespace`
+- Function-name prefix where applicable: `parseInput(): validates form data and trims whitespace`
 - Soft limit ~80 characters, hard limit 120
 - One line per entry, no trailing punctuation
 - British English spelling
 
-The ruleset is universal across every code file in every project. Hand-written descriptions that follow these rules are sacred — agents MUST NOT rewrite them merely because they don't match the auto-generated style.
+The ruleset is universal across every code file in every project. Hand-written descriptions that follow these rules are sacred. Agents MUST NOT rewrite them merely because they don't match the auto-generated style.
 
 ## Index Maintenance
 
-A code file and its `.index.md` sidecar are a **single artefact split into two formats** — the source file holds the code with numbered markers, the sidecar holds the human-readable descriptions and last-edit dates. Either format on its own is incomplete.
+A code file and its `.index.md` sidecar are a **single artefact split into two formats**: the source file holds the code with numbered markers, the sidecar holds the human-readable descriptions and last-edit dates. Either format on its own is incomplete.
 
 **It is not possible to edit one without editing the other.** Editing a numbered section without updating its sidecar entry is a project failure. Adding a new numbered section without adding its sidecar entry is a project failure. Deleting a numbered section without deleting its sidecar entry is a project failure.
 
@@ -176,29 +176,29 @@ After editing a numbered section in the source file, you MUST:
 
 **Hand-written descriptions are sacred.** Do not rewrite a description merely because it doesn't match an auto-generated style. Only rewrite if the description is genuinely inaccurate.
 
-This rule is universal across every project that uses Context Guard. The only exception is if the host project's own `CLAUDE.md` explicitly opts out (e.g. `## Index Maintenance: disabled — see project-specific reasons`).
+This rule is universal across every project that uses Context Guard. The only exception is if the host project's own `CLAUDE.md` explicitly opts out (e.g. `## Index Maintenance: disabled, see project-specific reasons`).
 
 ## Date Convention
 
-All dates written by Context Guard skills (`/start`, `/save`, `/end`, `/audit`, `/itemise`) use **dd/mm/yy** (UK format) going forward. Existing dates in safeguard files written before this convention are left as-is — do not retroactively rewrite them. The dd/mm/yy convention applies only to new entries.
+All dates written by Context Guard skills (`/start`, `/save`, `/end`, `/audit`, `/itemise`) use **dd/mm/yy** (UK format) going forward. Existing dates in safeguard files written before this convention are left as-is. Do not retroactively rewrite them. The dd/mm/yy convention applies only to new entries.
 
 ## Itemisation Protocol
 
 ITEMISATION: enabled
 
-The Itemisation Protocol adds hierarchical section numbers to code blocks so every part of the codebase is referenceable by address (e.g. "check section 2.3.1"). This reduces the context an LLM needs to load — instead of reading an entire file, you can point directly to the relevant block.
+The Itemisation Protocol adds hierarchical section numbers to code blocks so every part of the codebase is referenceable by address (e.g. "check section 2.3.1"). This reduces the context an LLM needs to load: instead of reading an entire file, you can point directly to the relevant block.
 
 **To disable:** change `ITEMISATION: enabled` to `ITEMISATION: disabled` above. The `/itemise` command will halt before making any changes.
 
 ### What Gets Numbered
 
-Number logical **blocks** that serve as identifiable, referenceable units — not individual lines.
+Number logical **blocks** that serve as identifiable, referenceable units, not individual lines.
 
-- **Sections** — top-level logical groups: `// 1. SECTION: Name` ... `// end of 1`
+- **Sections** are top-level logical groups: `// 1. SECTION: Name` ... `// end of 1`
 - **Functions and methods**: `// 1.1 functionName()` ... `// end of 1.1`
-- **Significant conditionals** — if/else/switch with meaningful business logic: `// 1.1.1 Description`
-- **Important loops** — for/while/foreach with non-trivial bodies: `// 1.1.2 Description`
-- **Key configuration objects** — complex arrays/objects passed to important calls: `// 1.2.1 Description`
+- **Significant conditionals** are if/else/switch with meaningful business logic: `// 1.1.1 Description`
+- **Important loops** are for/while/foreach with non-trivial bodies: `// 1.1.2 Description`
+- **Key configuration objects** are complex arrays/objects passed to important calls: `// 1.2.1 Description`
 - **Notable parameters** within those, when the parameter itself calls a function or is complex: `// 1.2.1.1 Description`
 
 ### What Does NOT Get Numbered
@@ -225,7 +225,7 @@ Run `/itemise` to apply the protocol to existing files. The command will:
 1. Confirm the list of files before touching anything
 2. Create `{filename}.itemise-backup` copies
 3. Rewrite each file with numbering applied
-4. Verify integrity (strips added comment-numbers, diffs against backup — confirms no code changed)
+4. Verify integrity (strips added comment-numbers, then diffs against the backup to confirm no code changed)
 5. Delete backups on success; restore on failure
 
 ### Cross-References
@@ -238,7 +238,7 @@ When a section calls a function or method defined in another numbered section of
 
 - Only track function/method calls, not shared variables or implicit dependencies
 - Multiple calls are comma-separated: `[calls: 1.1, 2.3, 5.1]`
-- Cross-references are scoped to the same file — cross-file dependencies are out of scope
+- Cross-references are scoped to the same file; cross-file dependencies are out of scope
 - References are refreshed automatically when `/itemise` is re-run
 
 ### Reading Specific Sections
@@ -259,7 +259,7 @@ For itemised files over ~100 lines, prefer targeted section reads over loading t
 
 When modifying a section, grep the file for `[calls: N.M]` references pointing to it. If other sections depend on the one being changed, flag this to the user:
 
-- "Section 4.2 calls this function — check if it needs updating too"
-- "This feature is linked with section 3.1 — consider adding a task to update it"
+- "Section 4.2 calls this function, so check if it needs updating too"
+- "This feature is linked with section 3.1, so consider adding a task to update it"
 
-This is advisory, not blocking — mention it and move on. The agent may already be aware of the dependency; that's fine. The check costs nothing and occasionally prevents a missed update.
+This is advisory, not blocking. Mention it and move on. The agent may already be aware of the dependency; that's fine. The check costs nothing and occasionally prevents a missed update.

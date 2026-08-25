@@ -1,5 +1,5 @@
 #!/bin/bash
-# Context Guard — Installer
+# Context Guard: Installer
 # Usage: ./install.sh [target-directory]
 # If no target directory given, uses current working directory.
 
@@ -17,7 +17,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # 2. SECTION: Welcome banner
 echo ""
-echo "  Context Guard — Installer"
+echo "  Context Guard Installer"
 echo "  ================================="
 echo ""
 echo "  Installing into: $TARGET"
@@ -60,7 +60,7 @@ if [ -n "$PARENT_CLAUDE_DIR" ]; then
     echo "    $PARENT_CLAUDE_DIR/.claude/"
     echo ""
     echo "  If you open Claude Code from that parent directory, it will look"
-    echo "  for commands there — not in $TARGET/.claude/commands/."
+    echo "  for commands there, not in $TARGET/.claude/commands/."
     echo "  CCG commands and hooks need to exist at the working directory level"
     echo "  to be discovered by Claude Code."
     echo ""

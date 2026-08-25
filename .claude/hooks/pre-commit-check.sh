@@ -1,12 +1,12 @@
 #!/bin/bash
-# Context Guard — Pre-commit safety hook
+# Context Guard: Pre-commit safety hook
 # Reminds Claude to update safeguard files before every git commit
 # Runs as a PreToolUse hook on Bash commands
 
 # 1. SECTION: Input parsing
 # Do NOT parse the hook payload with jq. jq is not present on a default Windows/Git Bash
 # install, and when it is missing this line fails silently, COMMAND ends up empty, and the
-# reminder below never fires — the hook looks installed and does nothing. This reminder only
+# reminder below never fires, so the hook looks installed and does nothing. This reminder only
 # has to spot "git commit" somewhere in the payload, which a raw substring check does without
 # needing any parser at all.
 INPUT=$(cat)
@@ -25,9 +25,9 @@ if [[ "$COMMAND" == *"git commit"* ]]; then
   echo "  6. Updated FEATURE_LIST.json if any feature status changed" >&2
   echo "  7. Recorded any credentials or fixtures created this session, in full" >&2
   echo "  8. Archived any approved plans to plans/ directory" >&2
-  echo "  (This is a reminder — the commit will proceed either way.)" >&2
+  echo "  (This is a reminder. The commit will proceed either way.)" >&2
 fi
 # end of 2
 
-# Always allow — this is a reminder, not a blocker
+# Always allow, because this is a reminder and not a blocker
 exit 0

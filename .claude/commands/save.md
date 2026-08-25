@@ -3,17 +3,17 @@ description: "Type /save to checkpoint progress mid-session. Updates all safegua
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
-# Context Guard — Mid-Session Checkpoint (/save)
+# Context Guard: Mid-Session Checkpoint (/save)
 
-The user wants to save current progress without ending the session. This is a lightweight checkpoint — no plan archiving, no session wrap-up, no full ledger rotation. Update safeguard files, commit, push, and confirm.
+The user wants to save current progress without ending the session. This is a lightweight checkpoint: no plan archiving, no session wrap-up, no full ledger rotation. Update safeguard files, commit, push, and confirm.
 
 **Date convention:** all dates written by this skill use **dd/mm/yy** (UK format). Do not retroactively rewrite older dates already in safeguard files; only new entries follow this rule.
 
 ## Step 0: Locate CCG Root
 
-Safeguard files may not be in the current working directory — they could be in a subdirectory. Find them first.
+Safeguard files may not be in the current working directory; they could be in a subdirectory. Find them first.
 
-0. **Check for a pointer file first:** if `CCG_LOCATION.md` exists at the working-directory root, it names CCG_ROOT directly. Trust it — skip the search below.
+0. **Check for a pointer file first:** if `CCG_LOCATION.md` exists at the working-directory root, it names CCG_ROOT directly. Trust it and skip the search below.
 1. **Check the working directory:** Try to read `CLAUDE.md` in the current directory.
 2. **If not found, search subdirectories:**
    ```bash
@@ -24,7 +24,7 @@ Safeguard files may not be in the current working directory — they could be in
 
 **All safeguard file paths in subsequent steps are relative to CCG_ROOT.** Git operations should also run from CCG_ROOT if it differs from the working directory.
 
-## Step 0.5: Completeness Check — never opt for brevity
+## Step 0.5: Completeness Check (never opt for brevity)
 
 Before saving, check what might be missing. Log anything missing BEFORE proceeding to Step 1.
 
@@ -32,7 +32,7 @@ Before saving, check what might be missing. Log anything missing BEFORE proceedi
 - Are there any tasks worked on NOT yet updated in TASK_REGISTRY.md?
 - Review the recent conversation for any decisions made but not logged in DECISIONS.md.
 - Any gotcha, workaround, or debug that ate more than ~15 minutes → LEARNED_BEHAVIOUR.md.
-- **Did this session create or delete any credentials, accounts, or test fixtures?** If so, the FULL details — usernames, passwords, IDs, which are real identities and which are fixtures — must be written down in the project's designated record (see CLAUDE.md; commonly `docs/TEST_USERS.md`) **now**, in full. Not summarised, not "I'll remember it". A checkpoint that omits them has failed: the next session cannot log in and the work is blocked until someone recreates the information from scratch.
+- **Did this session create or delete any credentials, accounts, or test fixtures?** If so, the FULL details (usernames, passwords, IDs, which are real identities and which are fixtures) must be written down in the project's designated record (see CLAUDE.md; commonly `docs/TEST_USERS.md`) **now**, in full. Not summarised, not "I'll remember it". A checkpoint that omits them has failed: the next session cannot log in and the work is blocked until someone recreates the information from scratch.
 
 Brevity is not a virtue here. Trimming a detail because it feels secondary is a decision to withhold information nobody authorised you to withhold.
 
@@ -56,12 +56,12 @@ Check and update ALL of these:
   **Clean save:** false
 
   ## In-flight
-  [What is actively being worked on right now — approach, current state, next micro-step. Handoff note to the next agent.]
+  [What is actively being worked on right now: approach, current state, next micro-step. Handoff note to the next agent.]
 
   ## Next step
   [User's stated intent in their own words]
   ```
-- `Clean save: false` tells the next `/start` that work was mid-flight — it will surface this under `🔄 Resume from last session`.
+- `Clean save: false` tells the next `/start` that work was mid-flight, so it will surface this under `🔄 Resume from last session`.
 - SESSION_LOG.md remains the historical record; RESUME_STATE.md is the current-state slice.
 
 ### SESSION_LOG.md
@@ -69,12 +69,12 @@ Check and update ALL of these:
 - If an entry already exists, append a checkpoint marker:
   ```
   **Checkpoint [HH:MM]:** [brief summary of progress since last save]
-  **In flight:** [what is actively being worked on right now — the approach, current state, and next micro-step]
+  **In flight:** [what is actively being worked on right now: the approach, current state, and next micro-step]
   ```
-- The "In flight" line is critical — if context is lost after this save, this is what the next session reads to understand exactly where you were mid-thought. Write it like a handoff note to yourself.
+- The "In flight" line is critical: if context is lost after this save, this is what the next session reads to understand exactly where you were mid-thought. Write it like a handoff note to yourself.
 - If any significant errors or blockers were hit since the last save, add: `**Error fixed:** [what happened and how it was resolved]`
 - If the user has expressed what they want done next, add: `**Next step:** [user's intent in their own words]`
-- Do NOT close out the session entry — work is continuing
+- Do NOT close out the session entry, because work is continuing
 
 ### TASK_REGISTRY.md
 - Log any new tasks created since the last save
@@ -82,7 +82,7 @@ Check and update ALL of these:
 - Update status of tasks worked on (✅ done / ⏳ pending / 🔄 in-progress)
 - **When marking a task ✅ done:** amend its Notes column with:
   - **Files:** 1–3 key paths touched
-  - **Approach:** one sentence — the pattern or library used
+  - **Approach:** one sentence naming the pattern or library used
   - **Governed by:** decision IDs that shaped the solution (if any)
 
   Example: `Files: widgets/favourite.php, blocks/fav-block.js | Approach: ACF flexible content with REST cache | Governed by: D-055`
@@ -95,7 +95,7 @@ Check and update ALL of these:
 
 ### DECISIONS.md
 - If any architectural decisions were made since the last save, log them
-- **Mandatory Category field** on every new entry. Assign one of: `forever-active`, `active-constraint`, `feature-specific`, `superseded`. If uncertain, default to `active-constraint` (safest — won't auto-archive).
+- **Mandatory Category field** on every new entry. Assign one of: `forever-active`, `active-constraint`, `feature-specific`, `superseded`. If uncertain, default to `active-constraint` (safest, since it won't auto-archive).
 - If a decision supersedes an earlier one, mark the old one `Category: superseded` with a pointer to the new D-number.
 
 ### LEARNED_BEHAVIOUR.md
@@ -103,7 +103,7 @@ Check and update ALL of these:
 - Do NOT log ordinary coding knowledge; only things a fresh agent would re-discover the hard way.
 - Entry format:
   ```
-  ## LB-NNN — [Short title] (Session N, dd/mm/yy)
+  ## LB-NNN: [Short title] (Session N, dd/mm/yy)
   **Context:** Where this surfaces (platform, plugin, version)
   **Gotcha:** What fails and how
   **Workaround:** What actually works
@@ -117,7 +117,7 @@ Check and update ALL of these:
 
 ## Step 2.5: Rotate Only If Overgrown
 
-**Full ledger rotation is `/end`'s job, not `/save`'s.** A mid-session checkpoint should be cheap — re-running the whole pagination pass every time a user types `/save` burns context for no benefit, because nothing has aged since the last one.
+**Full ledger rotation is `/end`'s job, not `/save`'s.** A mid-session checkpoint should be cheap, and re-running the whole pagination pass every time a user types `/save` burns context for no benefit, because nothing has aged since the last one.
 
 Do this instead: check whether any ledger's main file now holds MORE than the last 5 sessions' content. That normally only happens when the current session has just crossed a boundary, or when the previous `/end` was skipped. If one has overgrown, apply `/end` Step 2.5's rotation rules **to that file only**. Otherwise skip this step entirely and say nothing about it.
 
@@ -126,13 +126,13 @@ Do this instead: check whether any ledger's main file now holds MORE than the la
 Before proceeding to git, confirm every safeguard file was addressed. Output this checklist:
 
 **Update verification:**
-- RESUME_STATE.md — [overwritten with current in-flight / work is between sub-tasks, snapshot captured]
-- SESSION_LOG.md — [updated / already current — reason]
-- TASK_REGISTRY.md — [N tasks added/updated / no task changes — reason]
-- COMMENTS.md — [N comments logged / no new comments this session]
-- DECISIONS.md — [N decisions logged (all have Category field) / no new decisions — checked: no architecture choices, algorithm choices, UI patterns, data model changes, naming conventions, or approach reversals this session]
-- LEARNED_BEHAVIOUR.md — [N entries logged / no new tactical knowledge — checked: no gotchas, workarounds, or >15min debugs this session]
-- FEATURE_LIST.json — [N features verified / no QA updates — checked: user did not verify or report broken any features this session]
+- RESUME_STATE.md: [overwritten with current in-flight / work is between sub-tasks, snapshot captured]
+- SESSION_LOG.md: [updated / already current, with the reason]
+- TASK_REGISTRY.md: [N tasks added/updated / no task changes, with the reason]
+- COMMENTS.md: [N comments logged / no new comments this session]
+- DECISIONS.md: [N decisions logged (all have Category field) / no new decisions, checked: no architecture choices, algorithm choices, UI patterns, data model changes, naming conventions, or approach reversals this session]
+- LEARNED_BEHAVIOUR.md: [N entries logged / no new tactical knowledge, checked: no gotchas, workarounds, or >15min debugs this session]
+- FEATURE_LIST.json: [N features verified / no QA updates, checked: user did not verify or report broken any features this session]
 
 **Decision trigger check:** Were ANY of these made this session?
   Architecture choices, algorithm/approach selections, UI/UX pattern decisions,
@@ -144,11 +144,11 @@ Before proceeding to git, confirm every safeguard file was addressed. Output thi
   If yes and LEARNED_BEHAVIOUR.md wasn't updated → update it now.
   Do NOT log ordinary coding knowledge; only things a fresh agent would re-discover the hard way.
 
-**Feature trigger check:** Did the user **manually verify** any feature working end-to-end this session, or report one broken? Task completion does NOT count — only human verification.
+**Feature trigger check:** Did the user **manually verify** any feature working end-to-end this session, or report one broken? Task completion does NOT count; only human verification does.
   If yes and FEATURE_LIST.json wasn't updated → go back and update it now.
 
 If any file shows 0 changes, the reason must be specific (not "no changes needed").
-"No changes needed" without explanation is not acceptable — state what you checked.
+"No changes needed" without explanation is not acceptable. State what you checked.
 
 ## Step 3: Git Commit & Push
 
@@ -160,31 +160,31 @@ Check CLAUDE.md "Version Control" section:
 After updating safeguard files, commit everything to git so the save point is durable:
 
 1. Run `git status` to see ALL modified and untracked files
-2. Stage the safeguard files AND any approved code changes since the last commit — **by explicit path**.
+2. Stage the safeguard files AND any approved code changes since the last commit, **by explicit path**.
    **NEVER `git add -A` or `git add .`.** The working tree may be shared with other agents or with a paused lane of work, and a blanket stage sweeps their files into your commit. Name the paths you are committing. Anything you cannot attribute is left alone and surfaced to the user instead.
 3. Commit with a descriptive message: `"Checkpoint: [brief summary]"`
 4. Push to remote: `git pull --rebase origin main && git push`
-5. If `git status` still shows uncommitted project files after the commit — excluding gitignored files and other agents' untracked lanes — something was missed. Go back.
+5. If `git status` still shows uncommitted project files after the commit, excluding gitignored files and other agents' untracked lanes, something was missed. Go back.
 
 If there are no changes to commit (everything is already committed), skip this step.
 
 ## Step 4: Confirm
 
-Present a brief confirmation — keep it concise, not a full report:
+Present a brief confirmation. Keep it concise, not a full report:
 
 ```
 ## Checkpoint Saved
 
-- RESUME_STATE.md — in-flight snapshot written (Clean save: false)
-- SESSION_LOG.md — [updated/no changes needed]
-- TASK_REGISTRY.md — [N tasks updated / no changes needed]
-- COMMENTS.md — [N comments added / no changes needed]
-- DECISIONS.md — [N decisions added / no changes needed]
-- LEARNED_BEHAVIOUR.md — [N entries added / no changes needed]
-- FEATURE_LIST.json — [N features verified / no changes needed]
-- Git — [commit hash] pushed / no changes to commit
+- RESUME_STATE.md: in-flight snapshot written (Clean save: false)
+- SESSION_LOG.md: [updated/no changes needed]
+- TASK_REGISTRY.md: [N tasks updated / no changes needed]
+- COMMENTS.md: [N comments added / no changes needed]
+- DECISIONS.md: [N decisions added / no changes needed]
+- LEARNED_BEHAVIOUR.md: [N entries added / no changes needed]
+- FEATURE_LIST.json: [N features verified / no changes needed]
+- Git: [commit hash] pushed / no changes to commit
 
-Progress is saved. Continue working — run /save again any time, or /end to wrap up.
+Progress is saved. Continue working. Run /save again any time, or /end to wrap up.
 ```
 
 Do NOT perform any of the following (these are /end responsibilities):

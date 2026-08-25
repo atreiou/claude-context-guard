@@ -1,6 +1,6 @@
 # RESUME_STATE.md
 # Overwritten by /save. Wiped by /end. Read first by /start.
-# This file holds ONLY current in-flight state — not history. History lives in SESSION_LOG.md.
+# This file holds ONLY current in-flight state, not history. History lives in SESSION_LOG.md.
 
 **Session:** S0
 **Last updated:** YYYY-MM-DD HH:MM
